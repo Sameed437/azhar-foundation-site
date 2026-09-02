@@ -5,6 +5,56 @@ import React from 'react';
  * icons stay optically consistent at any size and inherit `currentColor`.
  */
 const paths = {
+  plus: <><path d="M12 5v14" /><path d="M5 12h14" /></>,
+  minus: <path d="M5 12h14" />,
+  search: <><circle cx="11" cy="11" r="7" /><path d="m16.5 16.5 4 4" /></>,
+  printer: (
+    <>
+      <path d="M7 8V3.5h10V8" />
+      <rect x="3.5" y="8" width="17" height="9" rx="2" />
+      <rect x="7" y="13.5" width="10" height="7" />
+    </>
+  ),
+  download: <><path d="M12 4v11" /><path d="m7 11 5 5 5-5" /><path d="M4.5 20h15" /></>,
+  upload: <><path d="M12 15V4" /><path d="m7 8 5-5 5 5" /><path d="M4.5 20h15" /></>,
+  logout: (
+    <>
+      <path d="M14 4H6.5A2.5 2.5 0 0 0 4 6.5v11A2.5 2.5 0 0 0 6.5 20H14" />
+      <path d="M10 12h10.5" />
+      <path d="m16.5 8 4 4-4 4" />
+    </>
+  ),
+  pencil: (
+    <path d="m5 16 -1 4 4-1L19.5 7.5a2.1 2.1 0 0 0-3-3L5 16Z" />
+  ),
+  trash: (
+    <>
+      <path d="M4.5 6.5h15" />
+      <path d="M9 6.5V4.5h6v2" />
+      <path d="M6.5 6.5 7.4 20h9.2l.9-13.5" />
+    </>
+  ),
+  grid: (
+    <>
+      <rect x="4" y="4" width="7" height="7" rx="1.5" />
+      <rect x="13" y="4" width="7" height="7" rx="1.5" />
+      <rect x="4" y="13" width="7" height="7" rx="1.5" />
+      <rect x="13" y="13" width="7" height="7" rx="1.5" />
+    </>
+  ),
+  receipt: (
+    <>
+      <path d="M6 3.5h12V20l-2.4-1.6L13.2 20l-2.4-1.6L8.4 20 6 18.4V3.5Z" />
+      <path d="M9 8h6" />
+      <path d="M9 11.5h6" />
+    </>
+  ),
+  settings: (
+    <>
+      <circle cx="12" cy="12" r="3" />
+      <path d="M12 3v2.4M12 18.6V21M21 12h-2.4M5.4 12H3m14.7-6.7-1.7 1.7M8 16l-1.7 1.7m0-11.4L8 8m8 8 1.7 1.7" />
+    </>
+  ),
   arrowRight: <><path d="M4 12h15" /><path d="m13 6 6 6-6 6" /></>,
   arrowUp: <><path d="M12 19V5" /><path d="m6 11 6-6 6 6" /></>,
   chevronDown: <path d="m6 9 6 6 6-6" />,

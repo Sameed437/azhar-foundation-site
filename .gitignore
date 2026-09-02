@@ -21,3 +21,9 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Real student/fee data - never commit to the public repo
+fee-data-import.json
+*.xlsx
+*.doc
+afs-fee-backup-*.json

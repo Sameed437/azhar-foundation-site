@@ -75,6 +75,7 @@ npm start          # dev server on http://localhost:3000
 | `/news` | News & Events | Announcements and the events calendar |
 | `/contact` | Contact | WhatsApp-first enquiry form, contact cards, map |
 | `/login` | Portal login | UI only — accounts are issued by the office |
+| `/admin` | **Fee Management System** | Staff-only panel — see below |
 | `*` | 404 | Links to every page |
 
 The header groups these into seven items; **Academics** and **Campus** are dropdowns
@@ -82,10 +83,43 @@ on desktop and expandable groups in the mobile drawer.
 
 ---
 
+## Fee Management System (`/admin`)
+
+A complete replacement for the manual Excel + Word-mail-merge fee workflow,
+lazy-loaded so it adds nothing to the public site's bundle:
+
+- **Dashboard** — expected / received / outstanding / concessions for any month,
+  a collection chart across the session, family payment status, largest balances.
+- **Students & Families** — family accounts exactly like the fee register
+  (siblings share an ID and a challan), with concessions, joining/leaving months,
+  opening arrears, search, and a paste-importer for the old Excel rows.
+- **Fee Sheet** — the monthly register: type what each family paid; arrears roll
+  forward automatically; one-click "mark fully paid".
+- **Challans** — one click prints challans for every family with a balance (or
+  all, or one): Student Copy + Office Copy per A4 page, due/validity dates and
+  the fine note, matching the old Word template.
+- **Settings** — session year, challan dates and wording, JSON backup/restore.
+
+**Storage has two modes.** Out of the box it runs in *device mode* (data in that
+browser's localStorage, protected by a passcode — download backups from
+Settings!). To get real logins, cloud storage and multi-device access, create a
+free Supabase project, run [`supabase/schema.sql`](supabase/schema.sql) in its
+SQL editor, add staff users under Authentication, and set the two env vars from
+[`.env.example`](.env.example) in Vercel — the panel switches over on the next
+deploy, and a backup file moves your data across. All tables are locked behind
+row-level security; the fee engine itself is covered by unit tests
+(`src/admin/data/calc.test.js`).
+
+---
+
 ## Project structure
 
 ```
 src/
+├── admin/                    ← fee management system (own lazy chunk)
+│   ├── AdminApp.js  AdminContext.js  admin.css
+│   ├── data/         calc.js (fee engine + tests), store, local & supabase drivers
+│   └── pages/        Dashboard, Families, FeeSheet, Challans, Settings, Login
 ├── data/site.js              ← ALL content: school details, nav, copy, results, events
 ├── styles/
 │   ├── tokens.css            design tokens (colour ramps, type scale, spacing, motion)
