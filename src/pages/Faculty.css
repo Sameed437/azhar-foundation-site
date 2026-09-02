@@ -1,0 +1,216 @@
+/* ==========================================================================
+   LEADERSHIP — a ruled ledger band, not cards. Four quiet entries.
+   ========================================================================== */
+
+.leadership { position: relative; overflow: hidden; }
+.leadership .container { position: relative; }
+
+.leadership-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-6) var(--space-5);
+}
+
+@media (max-width: 1080px) {
+  .leadership-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 560px) {
+  .leadership-grid { grid-template-columns: 1fr; }
+}
+
+.leader {
+  padding-inline-start: var(--space-5);
+  border-inline-start: 1px solid var(--border);
+}
+
+.leader .icon-tile { margin-bottom: var(--space-5); }
+
+.leader h3 {
+  font-size: var(--fs-h4);
+  margin-bottom: 0.5rem;
+}
+
+.leader p {
+  font-size: var(--fs-sm);
+  line-height: 1.72;
+  color: var(--text-muted);
+}
+
+/* ==========================================================================
+   DEPARTMENTS
+   ========================================================================== */
+
+.department-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  align-items: start;
+  gap: var(--space-5);
+}
+
+.department {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-6);
+  border-radius: var(--r-lg);
+  background: var(--white);
+  border: 1px solid var(--border-soft);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--dur-mid) var(--ease-out),
+              box-shadow var(--dur-mid) var(--ease-out),
+              border-color var(--dur-mid) var(--ease-out);
+}
+
+.department:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--blue-200);
+}
+
+.department:hover .icon-tile { background: var(--accent); color: #fff; }
+
+.department__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.department__head h3 {
+  font-size: var(--fs-h4);
+  margin-bottom: 0.1rem;
+}
+
+.department__head p {
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+}
+
+/* Stage badge — shared .chip supplies the pill; this only positions it */
+.department__stages {
+  align-self: flex-start;
+  margin-bottom: var(--space-5);
+}
+
+.department__stages svg { flex: none; }
+
+.role-list {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px dashed var(--border);
+}
+
+.role-list li {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  padding: var(--space-4) 0;
+  border-bottom: 1px dashed var(--border);
+}
+
+.role-list li:last-child { border-bottom: none; padding-bottom: 0; }
+
+.role-list__title {
+  font-family: var(--font-display);
+  font-size: var(--fs-h5);
+  font-weight: 600;
+  color: var(--navy-600);
+}
+
+.role-list__meta {
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+}
+
+/* ---- Explanatory note about withheld names ---- */
+
+.faculty-note {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+  max-width: 68ch;
+  margin: var(--space-7) auto 0;
+  padding: var(--space-5) var(--space-6);
+  border-radius: var(--r-lg);
+  background: var(--navy-50);
+  border: 1px solid var(--navy-100);
+}
+
+.faculty-note svg { color: var(--navy-300); flex: none; margin-top: 0.2em; }
+
+.faculty-note p {
+  font-size: var(--fs-sm);
+  line-height: 1.72;
+  color: var(--text-muted);
+}
+
+/* ==========================================================================
+   COMMITMENTS
+   ========================================================================== */
+
+.commitment-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+  gap: var(--space-5);
+}
+
+.commitment-card {
+  padding: var(--space-6);
+  border-radius: var(--r-lg);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.045);
+  backdrop-filter: blur(10px);
+  transition: transform var(--dur-mid) var(--ease-out),
+              border-color var(--dur-mid) var(--ease-out),
+              background-color var(--dur-mid) var(--ease-out);
+}
+
+.commitment-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(255, 255, 255, 0.24);
+  background: rgba(255, 255, 255, 0.075);
+}
+
+.commitment-card .icon-tile { margin-bottom: var(--space-5); }
+
+.commitment-card h3 {
+  font-size: var(--fs-h4);
+  color: #fff;
+  margin-bottom: 0.45rem;
+}
+
+.commitment-card p {
+  font-size: var(--fs-sm);
+  line-height: 1.72;
+  color: var(--text-on-dark-muted);
+}
+
+/* ==========================================================================
+   TEACH WITH US — a slim recruitment line, deliberately quieter than the
+   parent-facing closing panel below it
+   ========================================================================== */
+
+.teach-strip { padding-block: var(--section-y-tight) 0; }
+
+.teach-strip__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-4) var(--space-6);
+  padding-block: var(--space-5);
+  border-block: 1px solid var(--border);
+}
+
+.teach-strip__inner p {
+  max-width: 62ch;
+  font-size: var(--fs-sm);
+  line-height: 1.7;
+  color: var(--text-muted);
+}
+
+.teach-strip__inner strong {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--text-strong);
+}

@@ -1,0 +1,110 @@
+.action-bar {
+  position: fixed;
+  inset: auto 0 0 0;
+  z-index: calc(var(--z-drawer) - 2);
+  display: none;
+  flex-direction: column;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: saturate(180%) blur(14px);
+  -webkit-backdrop-filter: saturate(180%) blur(14px);
+  border-top: 1px solid var(--border-soft);
+  box-shadow: 0 -8px 28px rgba(16, 22, 80, 0.12);
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+@media (max-width: 700px) {
+  .action-bar { display: flex; }
+
+  /* The page's last element must clear the fixed bar */
+  .site-footer { padding-bottom: 92px; }
+
+  .back-to-top { bottom: clamp(6.5rem, 5rem + 4vw, 7.5rem); }
+}
+
+.action-bar__status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.3rem 1rem 0;
+  font-family: var(--font-display);
+  font-size: var(--fs-micro);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.action-bar__dot {
+  width: 7px;
+  height: 7px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--danger-500);
+}
+
+.action-bar__status[data-open="true"] .action-bar__dot {
+  background: var(--success-600);
+}
+
+.action-bar__buttons {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem 0.75rem;
+}
+
+.action-bar__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-width: 0;
+  min-height: 48px;
+  padding-inline: 0.25rem;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--white);
+  font-family: var(--font-display);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--navy-600);
+  transition: background-color var(--dur-fast) var(--ease-out),
+              border-color var(--dur-fast) var(--ease-out),
+              color var(--dur-fast) var(--ease-out);
+}
+
+.action-bar__btn:active { background: var(--navy-50); }
+
+.action-bar__btn--primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.action-bar__btn--primary:hover,
+.action-bar__btn--primary:active {
+  background: var(--accent-hover);
+  color: #fff;
+}
+
+.action-bar__btn svg { flex: none; }
+
+/* Narrow phones: smaller labels, tighter grid - three buttons must never wrap */
+@media (max-width: 390px) {
+  .action-bar__buttons {
+    gap: 0.4rem;
+    padding: 0.45rem 0.6rem 0.65rem;
+  }
+
+  .action-bar__btn {
+    gap: 0.3rem;
+    font-size: var(--fs-micro);
+  }
+
+  .action-bar__btn svg {
+    width: 16px;
+    height: 16px;
+  }
+}

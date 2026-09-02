@@ -1,0 +1,168 @@
+.page-hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  color: #fff;
+  padding-block: clamp(3rem, 1.8rem + 5vw, 5.5rem);
+  background: linear-gradient(
+    100deg,
+    var(--navy-950) 0%,
+    var(--navy-800) 48%,
+    var(--blue-800) 100%
+  );
+}
+
+/* Per-page accent glow — differentiates the nine interior mastheads */
+.page-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+}
+
+.page-hero--sky::before {
+  background: radial-gradient(circle at 85% 20%, rgba(56, 169, 244, 0.28), transparent 60%);
+}
+
+.page-hero--gold::before {
+  background: radial-gradient(circle at 85% 20%, rgba(255, 152, 0, 0.22), transparent 60%);
+}
+
+.page-hero--blue::before {
+  background: radial-gradient(circle at 85% 20%, rgba(26, 115, 232, 0.3), transparent 60%);
+}
+
+/* Faint blueprint grid, fading toward the base */
+.page-hero__grid {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 64px 64px;
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, transparent 78%);
+  mask-image: linear-gradient(to bottom, #000 0%, transparent 78%);
+  pointer-events: none;
+}
+
+.page-hero .crest-mark {
+  top: -14%;
+  right: -4%;
+  z-index: -1;
+}
+
+/* ---- Variants ---- */
+
+.page-hero--compact {
+  padding-block: clamp(2.25rem, 1.5rem + 2.5vw, 3.5rem);
+}
+
+/* Leaves room for a stat strip straddling the bottom seam */
+.page-hero--deep {
+  padding-bottom: clamp(5.5rem, 4rem + 5vw, 8.5rem);
+}
+
+.page-hero__inner { max-width: 52rem; }
+
+/* ---- Entrance choreography (mirrors the home hero) ---- */
+
+.page-hero .crumbs {
+  animation: rise-in 600ms var(--ease-out) backwards;
+}
+
+.page-hero__eyebrow {
+  animation: rise-in 600ms var(--ease-out) 60ms backwards;
+}
+
+.page-hero__title {
+  animation: rise-in 600ms var(--ease-out) 120ms backwards;
+}
+
+.page-hero__lead,
+.page-hero__actions {
+  animation: rise-in 600ms var(--ease-out) 180ms backwards;
+}
+
+.page-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin-top: var(--space-6);
+}
+
+/* ---- Breadcrumb ---- */
+
+.crumbs { margin-bottom: var(--space-5); }
+
+.crumbs ol {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: var(--fs-xs);
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.crumbs a {
+  color: rgba(255, 255, 255, 0.72);
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.crumbs a:hover { color: #fff; }
+
+.crumbs li[aria-current] {
+  color: var(--sky-300);
+  font-weight: 600;
+}
+
+.crumbs svg {
+  display: block;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+/* ---- Type ---- */
+
+.page-hero__eyebrow { color: var(--sky-300); }
+
+.page-hero .eyebrow::before {
+  background:
+    linear-gradient(var(--sky-200), var(--sky-200)) 0 0 / 14px 2px,
+    linear-gradient(var(--sky-400), var(--sky-400)) 0 3px / 22px 2px,
+    linear-gradient(var(--gold-400), var(--gold-400)) 0 6px / 9px 2px;
+  background-repeat: no-repeat;
+}
+
+.page-hero__title {
+  font-size: clamp(2.1rem, 1.5rem + 3vw, 3.5rem);
+  font-weight: 800;
+  letter-spacing: var(--tracking-display);
+  color: #fff;
+}
+
+.page-hero__lead {
+  margin-top: var(--space-4);
+  max-width: 44rem;
+  font-size: var(--fs-lead);
+  line-height: 1.68;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+@media (max-width: 640px) {
+  .page-hero .crest-mark {
+    width: 240px;
+    right: -18%;
+    top: auto;
+    bottom: -18%;
+  }
+
+  .page-hero__lead {
+    font-size: 1.02rem;
+    line-height: 1.62;
+  }
+
+  .page-hero__actions .btn {
+    flex: 1 1 100%;
+    justify-content: center;
+  }
+}

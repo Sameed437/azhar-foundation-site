@@ -1,0 +1,323 @@
+/* ==========================================================================
+   HEADLINE FIGURES
+   ========================================================================== */
+
+/* The strip straddles the hero seam, like the home stat-bar */
+.headline { padding-block: 0 var(--section-y-tight); }
+
+.headline-grid {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  margin-top: clamp(-4.5rem, -2rem - 2vw, -2.5rem);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  background: var(--border-soft);
+  border: 1px solid var(--border-soft);
+  box-shadow: var(--shadow-md);
+}
+
+@media (max-width: 860px) {
+  .headline-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 380px) {
+  .headline-grid { grid-template-columns: 1fr; }
+}
+
+.headline-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: clamp(1.4rem, 1rem + 1.4vw, 2.1rem) clamp(1rem, 0.6rem + 1.2vw, 1.75rem);
+  background: var(--white);
+}
+
+.headline-card__value {
+  display: inline-flex;
+  align-items: baseline;
+  font-family: var(--font-display);
+  font-size: clamp(1.9rem, 1.4rem + 1.9vw, 2.85rem);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.05;
+  letter-spacing: var(--tracking-display);
+  color: var(--navy-600);
+}
+
+/* Affixes step back so the number leads */
+.headline-card__value .stat-suffix {
+  font-size: 0.58em;
+  font-weight: 700;
+  color: var(--blue-500);
+  margin-left: 0.06em;
+}
+
+.headline-card__label {
+  font-family: var(--font-display);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--ink-800);
+}
+
+.headline-card__caption {
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+}
+
+/* ==========================================================================
+   TOPPERS
+   ========================================================================== */
+
+/* section--dark supplies the ground and ambience; clip the crest watermark */
+.toppers-section { overflow: hidden; }
+
+/* ==========================================================================
+   FIVE-YEAR TABLE
+   ========================================================================== */
+
+/* Wide tables scroll inside their own container rather than the page.
+   Layered scroll shadows (background-attachment: local) fade in at either
+   edge so clipped columns under 620px read as scrollable. */
+.table-wrap {
+  overflow-x: auto;
+  border-radius: var(--r-lg);
+  border: 1px solid var(--border-soft);
+  box-shadow: var(--shadow-sm);
+  background:
+    linear-gradient(to right, var(--white) 30%, rgba(255, 255, 255, 0)) 0 0,
+    linear-gradient(to right, rgba(255, 255, 255, 0), var(--white) 70%) 100% 0,
+    radial-gradient(farthest-side at 0 50%, rgba(16, 22, 80, 0.16), transparent) 0 0,
+    radial-gradient(farthest-side at 100% 50%, rgba(16, 22, 80, 0.16), transparent) 100% 0
+    var(--white);
+  background-repeat: no-repeat;
+  background-size: 44px 100%, 44px 100%, 16px 100%, 16px 100%;
+  background-attachment: local, local, scroll, scroll;
+}
+
+.results-table {
+  width: 100%;
+  min-width: 620px;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.results-table thead th {
+  padding: var(--space-4) var(--space-5);
+  background: var(--navy-50);
+  border-bottom: 1px solid var(--navy-100);
+  font-family: var(--font-display);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--navy-600);
+  white-space: nowrap;
+}
+
+.results-table tbody tr { border-bottom: 1px solid var(--border-soft); }
+.results-table tbody tr:last-child { border-bottom: none; }
+
+.results-table tbody tr:hover { background: var(--ink-50); }
+
+.results-table tbody tr.is-latest { background: var(--blue-50); }
+.results-table tbody tr.is-latest:hover { background: var(--blue-100); }
+
+.results-table th[scope="row"] {
+  padding: var(--space-4) var(--space-5);
+  font-family: var(--font-display);
+  font-size: var(--fs-body);
+  font-weight: 700;
+  color: var(--navy-600);
+}
+
+.year-cell {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.6rem;
+}
+
+.results-table td {
+  padding: var(--space-4) var(--space-5);
+  font-size: var(--fs-sm);
+  color: var(--ink-700);
+  vertical-align: middle;
+}
+
+/* Numerals line up column to column */
+.results-table td,
+.results-table th { font-variant-numeric: tabular-nums; }
+
+/* Number-only columns read right-aligned */
+.results-table thead th:nth-child(2),
+.results-table thead th:nth-child(4),
+.results-table thead th:nth-child(5),
+.results-table td:nth-child(2),
+.results-table td:nth-child(4),
+.results-table td:nth-child(5) { text-align: right; }
+
+.results-table td:nth-child(5) {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--navy-600);
+}
+
+/* Pass-rate cell: a mini bar next to the number */
+.rate {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.rate__bar {
+  flex: 1;
+  min-width: 60px;
+  max-width: 130px;
+  height: 6px;
+  border-radius: var(--r-pill);
+  background: var(--ink-100);
+  overflow: hidden;
+}
+
+.rate__bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--grad-brand);
+}
+
+.rate__value {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--navy-600);
+  min-width: 3ch;
+}
+
+/* Honest footnote under the table */
+.history__note {
+  margin-top: var(--space-4);
+  font-size: var(--fs-sm);
+  line-height: 1.72;
+  color: var(--text-muted);
+  max-width: 62ch;
+}
+
+/* ==========================================================================
+   GRADE SPREAD + PLACEMENTS
+   ========================================================================== */
+
+.breakdown__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: clamp(2rem, 1rem + 4vw, 4rem);
+  align-items: start;
+}
+
+.breakdown__note {
+  margin: var(--space-4) 0 var(--space-6);
+  font-size: var(--fs-sm);
+  line-height: 1.72;
+  color: var(--text-muted);
+  max-width: 46ch;
+}
+
+/* ---- Grade bars ---- */
+
+.grade-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.grade-list__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: 0.45rem;
+}
+
+.grade-list__grade {
+  font-family: var(--font-display);
+  font-size: var(--fs-h5);
+  font-weight: 800;
+  color: var(--navy-600);
+}
+
+.grade-list__share {
+  font-family: var(--font-display);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent-text);
+}
+
+.grade-list__bar {
+  height: 10px;
+  border-radius: var(--r-pill);
+  background: var(--white);
+  border: 1px solid var(--border-soft);
+  overflow: hidden;
+}
+
+.grade-list__bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--grad-brand);
+}
+
+.grade-list li:first-child .grade-list__bar span { background: var(--grad-gold); }
+
+.grade-list__note {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+}
+
+/* ---- Placements ---- */
+
+.placement-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.placement-list li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  border-radius: var(--r-md);
+  background: var(--white);
+  border: 1px solid var(--border-soft);
+  transition: border-color var(--dur-fast) var(--ease-out),
+              box-shadow var(--dur-fast) var(--ease-out);
+}
+
+.placement-list li:hover {
+  border-color: var(--blue-200);
+  box-shadow: var(--shadow-sm);
+}
+
+.placement-list .icon-tile { width: 40px; height: 40px; }
+
+.placement-list__name {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--fs-sm);
+  line-height: 1.5;
+  color: var(--ink-700);
+}
+
+.placement-list__count {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: var(--tracking-tight);
+  color: var(--navy-600);
+}

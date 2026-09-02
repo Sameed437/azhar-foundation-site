@@ -1,0 +1,30 @@
+.back-to-top {
+  position: fixed;
+  right: clamp(1rem, 0.4rem + 1.6vw, 2rem);
+  bottom: clamp(1rem, 0.4rem + 1.6vw, 2rem);
+  z-index: 90;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border: none;
+  border-radius: 50%;
+  background: var(--navy-600);
+  color: #fff;
+  box-shadow: var(--shadow-lg);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(14px) scale(0.9);
+  transition: opacity var(--dur-mid) var(--ease-out),
+              transform var(--dur-mid) var(--ease-spring),
+              visibility var(--dur-mid),
+              background-color var(--dur-fast) var(--ease-out);
+}
+
+.back-to-top.is-shown {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+}
+
+.back-to-top:hover { background: var(--accent); }

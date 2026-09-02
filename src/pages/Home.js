@@ -1,159 +1,312 @@
-import React, { useEffect } from 'react';
-import AOS from 'aos';
-import 'aos/dist/aos.css';
+import React from 'react';
+import { Link } from 'react-router-dom';
 import CountUp from 'react-countup';
+import Icon from '../components/Icon';
+import Reveal from '../components/Reveal';
+import Gallery from '../components/Gallery';
+import TopperGrid from '../components/TopperGrid';
+import {
+  admissionsSession,
+  features,
+  gallery,
+  programmes,
+  school,
+  stats,
+  toppers,
+} from '../data/site';
 import './Home.css';
-import { Carousel } from 'react-responsive-carousel';
-import "react-responsive-carousel/lib/styles/carousel.min.css";
 
+/* The hero photo reappearing as a slide is a dead payoff — leave it out. */
+const homeSlides = gallery.filter((slide) => slide.src !== '/images/banner.jpg');
 
-const Home = () => {
-  useEffect(() => {
-    AOS.init({ duration: 1000 });
-  }, []);
+const Home = () => (
+  <div className="home">
+    {/* ==================== HERO ==================== */}
+    <section className="hero">
+      <div className="hero__media">
+        <picture>
+          <source
+            type="image/webp"
+            srcSet="/images/banner-900.webp 900w, /images/banner-1600.webp 1600w"
+            sizes="100vw"
+          />
+          <img src="/images/banner.jpg" alt="" aria-hidden="true" />
+        </picture>
+      </div>
+      <div className="hero__tint" aria-hidden="true" />
+      <div className="hero__scrim" aria-hidden="true" />
+      <div className="hero__grid" aria-hidden="true" />
 
-  return (
-    <div className="home-page">
+      <div className="container hero__inner">
+        <div className="hero__copy">
+          <p className="hero__eyebrow">
+            <span className="hero__pulse" aria-hidden="true" />
+            Admissions open for the {admissionsSession()} session
+          </p>
 
-      {/* Hero Section */}
-      <section className="hero" style={{ backgroundImage: `url('/images/banner.jpg')` }}>
-        <div className="hero-overlay">
-          <h1>Azhar Foundation School</h1>
-          <p>Providing Excellence in Education Since 2001</p>
-          <a href="/contact" className="cta-button">Contact Us</a>
+          <h1 className="hero__title">
+            Where strong foundations
+            <span className="hero__title-accent"> build confident futures</span>
+          </h1>
+
+          <p className="hero__lead">
+            {school.name} has taught Lahore&rsquo;s children since {school.foundedYear} —
+            pairing academic rigour with character, from Playgroup through Matriculation.
+          </p>
+
+          <div className="hero__actions">
+            <Link to="/contact?about=Campus%20visit#enquiry" className="btn btn--primary btn--lg">
+              Book a campus visit
+              <Icon name="arrowRight" size={18} className="btn__arrow" />
+            </Link>
+            <Link to="/admissions" className="btn btn--on-dark btn--lg">
+              How admissions work
+            </Link>
+          </div>
+
+          <ul className="hero__proof">
+            <li>
+              <Icon name="shield" size={18} />
+              <span>Registered with {school.board}</span>
+            </li>
+            <li>
+              <Icon name="clock" size={18} />
+              <span>Established {school.foundedYear}</span>
+            </li>
+            <li>
+              <Icon name="users" size={18} />
+              <span>Secure, monitored campus</span>
+            </li>
+          </ul>
         </div>
-      </section>
+      </div>
 
-      {/* About Section */}
-      <section className="description" data-aos="fade-up">
-        <h2>About Our School</h2>
-        <p>
-          Azhar Foundation School was established in 2001 with a vision to provide quality education grounded in academic rigor, discipline, and moral values. For over two decades, we have remained committed to nurturing young minds through a balanced approach to academics, character development, and co-curricular activities.
-
-Our campus provides a safe, inclusive, and intellectually stimulating environment where students from Playgroup to Matriculation are empowered to grow into confident, responsible, and successful individuals. With a highly qualified teaching faculty, smart classrooms, and a learner-centered curriculum, we strive to instill lifelong learning habits, leadership qualities, and ethical values in every child.
-
-At Azhar Foundation School, excellence is not just a goal — it is a tradition we proudly uphold.
-        </p>
-      </section>
-{/* Matric Result Highlights */}
-<section className="result-section" data-aos="fade-up">
-  <h2>🎓 Matriculation Result Highlights</h2>
-  <p className="subtitle">Board Exam Performance (Out of 1100 Marks)</p>
-
-  <div className="result-cards">
-    <div className="result-card" data-aos="zoom-in">
-      <span className="rank">🥇 1st</span>
-      <h3>Anzal Azhar Ch.</h3>
-      <p className="score">1093 <span className="grade">A+</span></p>
-    </div>
-
-    <div className="result-card" data-aos="zoom-in" data-aos-delay="100">
-      <span className="rank">🥈 2nd</span>
-      <h3>Abdullah Bashir</h3>
-      <p className="score">1092 <span className="grade">A+</span></p>
-    </div>
-
-    <div className="result-card" data-aos="zoom-in" data-aos-delay="200">
-      <span className="rank">🥉 3rd</span>
-      <h3>Abdul Rehman</h3>
-      <p className="score">1089 <span className="grade">A+</span></p>
-    </div>
-
-    <div className="result-card" data-aos="zoom-in" data-aos-delay="300">
-      <span className="rank">4th</span>
-      <h3>Minahil Azeem</h3>
-      <p className="score">1081 <span className="grade">A+</span></p>
-    </div>
-  </div>
-</section>
-{/* Principal’s Message Section */}
-<section className="founder-section" data-aos="fade-right">
-  <div className="founder-content">
-    <div className="founder-image">
-      <img src="/images/cheif.jpg" alt="Principal" />
-    </div>
-    <div className="founder-message">
-      <h2>Message from the Pattern-In-Cheif</h2>
-      <p>
-        At Azhar Foundation School, we believe in the power of hard work,
-        consistency, and discipline. Every achievement begins with focused effort.
-        Our mission is to inspire students to dream big, stay committed,
-        and transform those dreams into reality. Remember: success is earned, not gifted.
-      </p>
-      <button>Read More</button>
-    </div>
-  </div>
-</section>
-{/* Slideshow Section */}
-<section className="slideshow-section" data-aos="zoom-in-up">
-  <Carousel
-    autoPlay
-    infiniteLoop
-    showThumbs={false}
-    showStatus={false}
-    interval={3000}
-    transitionTime={800}
-    stopOnHover={true}
-  >
-    <div>
-      <img src="/images/slide1.jpg" alt="Annual Function" />
-    </div>
-    <div>
-      <img src="/images/slide2.jpg" alt="Students Activity" />
-    </div>
-    <div>
-      <img src="/images/slide3.jpg" alt="Science Fair" />
-    </div>
-    <div>
-      <img src="/images/slide4.jpg" alt="Classroom Learning" />
-    </div>
-  </Carousel>
-</section>
-
-
-      {/* Classes Offered */}
-      <section className="classes-offered" data-aos="fade-up">
-        <h2>Classes We Offer</h2>
-        <div className="class-cards">
-          <div className="class-card">Playgroup</div>
-          <div className="class-card">Nursery</div>
-          <div className="class-card">Prep</div>
-          <div className="class-card">Grade 1–8</div>
-          <div className="class-card">Matriculation</div>
+      {/* Stats bar that straddles the hero and the next section */}
+      <div className="container">
+        <div className="stat-bar">
+          {stats.map((stat, i) => (
+            <Reveal className="stat-bar__item" key={stat.label} delay={i * 90}>
+              <span className="stat-bar__value">
+                <CountUp end={stat.value} duration={1.4} enableScrollSpy scrollSpyOnce />
+                <span className="stat-suffix">{stat.suffix}</span>
+              </span>
+              <span className="stat-bar__label">{stat.label}</span>
+              <span className="stat-bar__caption">{stat.caption}</span>
+            </Reveal>
+          ))}
         </div>
-      </section>
+      </div>
+    </section>
 
-      {/* Stats Section */}
-      <section className="stats" data-aos="zoom-in">
-        <div className="stat">
-          <h3><CountUp end={200} duration={3} /></h3>
-          <p>Students Enrolled</p>
-        </div>
-        <div className="stat">
-          <h3><CountUp end={95} duration={3} suffix="%" /></h3>
-          <p>Board Exam Success Rate</p>
-        </div>
-        <div className="stat">
-          <h3><CountUp end={2001} duration={2} /></h3>
-          <p>Founded Year</p>
-        </div>
-      </section>
+    {/* ==================== INTRODUCTION ==================== */}
+    <section className="section intro">
+      <div className="bg-dots" aria-hidden="true" />
+      <div className="container intro__inner">
+        <Reveal variant="left" className="intro__lead">
+          <p className="eyebrow">About the school</p>
+          <h2>
+            Two decades of teaching that treats every child as an individual.
+          </h2>
+        </Reveal>
 
-      {/* Why Choose Us */}
-      <section className="features" data-aos="fade-up" data-aos-delay="100">
-        <h2>Why Choose Us?</h2>
+        <Reveal variant="right" delay={120} className="intro__body">
+          <p>
+            {school.name} was established in {school.foundedYear} with a simple conviction:
+            quality education is built on academic rigour, steady discipline and clear moral
+            grounding. We have held to it ever since.
+          </p>
+          <p>
+            Our campus is a safe, inclusive and intellectually demanding place. Students from
+            Playgroup to Matriculation learn in small sections led by subject specialists, in
+            smart classrooms built around a learner-centred curriculum.
+          </p>
+          <p>
+            Excellence here is not an ambition we advertise. It is a standard we keep, one
+            cohort at a time.
+          </p>
+
+          <Link to="/about" className="link-arrow">
+            Read our full story
+            <Icon name="arrowRight" size={17} />
+          </Link>
+        </Reveal>
+      </div>
+    </section>
+
+    {/* ==================== PROGRAMMES ==================== */}
+    <section className="section programmes" id="programmes">
+      <div className="container">
+        <Reveal className="section-head">
+          <p className="eyebrow">Academic programmes</p>
+          <h2>One school, four stages, a single standard</h2>
+          <p>
+            Children join us at three and leave at sixteen. Each stage is designed to hand the
+            next one a student who is ready.
+          </p>
+        </Reveal>
+
+        <div className="programme-grid">
+          {programmes.map((programme, i) => (
+            <Reveal
+              key={programme.stage}
+              delay={i * 90}
+              className="programme card card--interactive"
+            >
+              <span className="icon-tile">
+                <Icon name={programme.icon} size={24} />
+              </span>
+
+              <div className="programme__head">
+                <h3>{programme.stage}</h3>
+                <span className="chip">{programme.ages}</span>
+              </div>
+
+              <p className="programme__grades">{programme.grades}</p>
+              <p className="programme__text">{programme.description}</p>
+
+              <ul className="programme__list">
+                {programme.highlights.map((highlight) => (
+                  <li key={highlight}>
+                    <Icon name="check" size={15} strokeWidth={2.4} />
+                    {highlight}
+                  </li>
+                ))}
+              </ul>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    {/* ==================== RESULTS ==================== */}
+    <section className="section results section--dark">
+      <img src="/images/logo.png" alt="" aria-hidden="true" className="crest-mark" />
+
+      <div className="container">
+        <Reveal className="section-head section-head--center">
+          <p className="eyebrow">Matriculation 2024</p>
+          <h2>A result sheet we are proud to publish</h2>
+          <p>
+            Board examination performance out of 1100 marks. Four students crossed 1080 —
+            every one of them an A+ grade.
+          </p>
+        </Reveal>
+
+        <TopperGrid toppers={toppers} />
+
+        <Reveal variant="fade" delay={200} className="results__more">
+          <Link to="/results" className="link-arrow">
+            See the five-year record
+            <Icon name="arrowRight" size={17} />
+          </Link>
+        </Reveal>
+      </div>
+    </section>
+
+    {/* ==================== PRINCIPAL'S MESSAGE ==================== */}
+    <section className="section message">
+      <div className="container">
+        <Reveal variant="scale" className="message__card">
+          <div className="message__portrait media-graded">
+            <img src="/images/cheif.jpg" alt="Patron-in-Chief of Azhar Foundation School" />
+          </div>
+
+          <div className="message__body">
+            <span className="message__quote-mark" aria-hidden="true">
+              <Icon name="quote" size={40} strokeWidth={0} />
+            </span>
+
+            <p className="eyebrow">Message from the Patron-in-Chief</p>
+
+            <blockquote className="message__quote">
+              &ldquo;At {school.name} we believe in the power of hard work, consistency and
+              discipline. Every achievement begins with focused effort. Our mission is to
+              inspire students to dream big, stay committed, and turn those dreams into
+              reality — because success is earned, never gifted.&rdquo;
+            </blockquote>
+
+            <div className="message__signature">
+              <span className="message__name">Ch. Azhar Mehmood</span>
+              <span className="message__role">Patron-in-Chief &amp; Founder</span>
+            </div>
+          </div>
+        </Reveal>
+      </div>
+    </section>
+
+    {/* ==================== CAMPUS LIFE ==================== */}
+    <section className="section campus section--sunken">
+      <div className="container">
+        <Reveal className="section-head section-head--center">
+          <p className="eyebrow">Campus life</p>
+          <h2>School is more than the syllabus</h2>
+          <p>
+            Annual functions, science fairs, debates and sports — the moments where confidence
+            is actually built.
+          </p>
+        </Reveal>
+
+        <Reveal variant="fade" delay={100}>
+          <Gallery slides={homeSlides} />
+        </Reveal>
+      </div>
+    </section>
+
+    {/* ==================== WHY CHOOSE US ==================== */}
+    <section className="section features">
+      <div className="container">
+        <Reveal className="section-head section-head--center">
+          <p className="eyebrow">Why choose us</p>
+          <h2>Six reasons parents keep sending us their children</h2>
+        </Reveal>
+
         <div className="feature-grid">
-          <div className="feature-card">Smart Classrooms</div>
-          <div className="feature-card">Qualified Teachers</div>
-          <div className="feature-card">Moral Development</div>
-          <div className="feature-card">Affordable Fees</div>
-          <div className="feature-card">Academic Excellence</div>
-          <div className="feature-card">Playgroup to Matric</div>
+          {features.map((feature, i) => (
+            <Reveal
+              key={feature.title}
+              delay={(i % 3) * 90}
+              className="feature card card--interactive"
+            >
+              <span className="icon-tile">
+                <Icon name={feature.icon} size={24} />
+              </span>
+              <h3>{feature.title}</h3>
+              <p>{feature.text}</p>
+            </Reveal>
+          ))}
         </div>
-      </section>
+      </div>
+    </section>
 
-    </div>
-  );
-};
+    {/* ==================== CTA ==================== */}
+    <section className="cta-section">
+      <div className="container">
+        <Reveal variant="scale" className="cta-panel">
+          <img src="/images/logo.png" alt="" aria-hidden="true" className="crest-mark" />
+
+          <div>
+            <p className="eyebrow">Admissions</p>
+            <h2>Come and see the school for yourself</h2>
+            <p className="cta-panel__text">
+              Book a campus visit, meet the section head, and ask us anything. Seats for the
+              coming session are filling now.
+            </p>
+          </div>
+
+          <div className="cta-panel__actions">
+            <Link to="/admissions" className="btn btn--gold btn--lg">
+              Apply for admission
+              <Icon name="arrowRight" size={18} className="btn__arrow" />
+            </Link>
+            <a href={school.phoneHref} className="btn btn--on-dark btn--lg">
+              <Icon name="phone" size={17} />
+              {school.phone}
+            </a>
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  </div>
+);
 
 export default Home;

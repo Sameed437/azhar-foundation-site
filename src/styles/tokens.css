@@ -1,0 +1,186 @@
+/* ==========================================================================
+   Azhar Foundation School — Design Tokens
+   Brand palette preserved from the original site:
+     navy  #1a237e  · action blue #1a73e8 · deep blue #0d47a1
+     tints #e3f2fd / #c5cae9 · gold #ff9800
+   ========================================================================== */
+
+:root {
+  /* ---- Brand: navy (primary ink / institutional authority) ---- */
+  --navy-50:  #eef0fa;
+  --navy-100: #d6dbf2;
+  --navy-200: #b0b8e6;
+  --navy-300: #8490d6;
+  --navy-400: #5665c0;
+  --navy-500: #33409f;
+  --navy-600: #1a237e;  /* brand navy */
+  --navy-700: #151d68;
+  --navy-800: #101650;
+  --navy-900: #0a0e35;
+  --navy-950: #060926;
+
+  /* ---- Brand: blue (action / links / focus) ---- */
+  --blue-50:  #e8f1fe;
+  --blue-100: #d2e3fd;
+  --blue-200: #a6c8fb;
+  --blue-300: #75a8f6;
+  --blue-400: #4189f1;
+  --blue-500: #1a73e8;  /* brand action blue */
+  --blue-600: #135cbd;
+  --blue-700: #0d47a1;  /* brand deep blue */
+  --blue-800: #093679;
+  --blue-900: #06264f;
+
+  /* ---- Brand: sky (from the crest logo — highlights, gradients) ---- */
+  --sky-100: #dff1fe;
+  --sky-200: #b9e2fd;
+  --sky-300: #7cc8fb;
+  --sky-400: #38a9f4;
+  --sky-500: #1194e6;
+
+  /* ---- Accent: gold (achievement, distinction) ---- */
+  --gold-100: #fff2d9;
+  --gold-200: #ffe0a8;
+  --gold-300: #ffc766;
+  --gold-400: #ffab2e;
+  --gold-500: #ff9800;  /* brand gold */
+  --gold-600: #d97d00;
+  --gold-700: #a85f00;
+
+  /* ---- Neutrals (navy-tinted greys, so greys feel part of the brand) ---- */
+  --ink-950: #0b0f1e;
+  --ink-900: #141a2e;
+  --ink-800: #232a41;
+  --ink-700: #363e57;
+  --ink-600: #4c556f;
+  --ink-500: #667089;
+  --ink-400: #8a93a8;
+  --ink-300: #b3bacb;
+  --ink-200: #d6dae4;
+  --ink-100: #e8ebf1;
+  --ink-50:  #f4f6f9;   /* original page background */
+  --white:   #ffffff;
+
+  /* ---- Semantic surfaces & text ---- */
+  --bg:            var(--ink-50);
+  --bg-elevated:   var(--white);
+  --bg-sunken:     #e7ebf8;
+  --bg-inverse:    var(--navy-900);
+
+  --text-strong:   var(--navy-600);
+  --text-body:     var(--ink-700);
+  --text-muted:    var(--ink-500);
+  --text-faint:    var(--ink-500);
+  --text-on-dark:  rgba(255, 255, 255, 0.92);
+  --text-on-dark-muted: rgba(255, 255, 255, 0.66);
+
+  --border:        var(--ink-200);
+  --border-soft:   var(--ink-100);
+  --border-strong: var(--ink-300);
+  --border-on-dark: rgba(255, 255, 255, 0.14);
+
+  --accent:        var(--blue-500);
+  --accent-text:   var(--blue-600); /* small text on light surfaces - blue-500 fails AA there */
+  --accent-hover:  var(--blue-600);
+  --accent-active: var(--blue-700);
+  --focus-ring:    var(--blue-500); /* blue-400 fell under 3:1 on the sunken surface */
+
+  --danger-600: #c5221f;
+  --danger-500: #d93025;
+  --danger-100: #f6c9c5;
+  --danger-50:  #fdf3f2;
+  --success-600: #137333;
+  --success-100: #a8dab5;
+  --success-50:  #e6f4ea;
+
+  /* ---- Signature gradients ---- */
+  --grad-brand: linear-gradient(135deg, var(--navy-700) 0%, var(--blue-600) 55%, var(--sky-500) 100%);
+  --grad-hero:  linear-gradient(115deg, rgba(10, 14, 53, 0.94) 0%, rgba(21, 29, 104, 0.86) 42%, rgba(13, 71, 161, 0.62) 100%);
+  --grad-gold:  linear-gradient(120deg, var(--gold-500), var(--gold-300));
+  --grad-sheen: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0));
+
+  /* ---- Typography ---- */
+  --font-display: 'Plus Jakarta Sans', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-body:    'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+
+  /* Fluid type scale — clamp(min, preferred, max) */
+  --fs-display: clamp(2.6rem, 1.6rem + 4.4vw, 4.75rem);
+  --fs-h1:      clamp(2.1rem, 1.5rem + 2.6vw, 3.25rem);
+  --fs-h2:      clamp(1.7rem, 1.32rem + 1.6vw, 2.5rem);
+  --fs-h3:      clamp(1.24rem, 1.1rem + 0.62vw, 1.6rem);
+  --fs-h4:      clamp(1.06rem, 1rem + 0.3vw, 1.22rem);
+  --fs-lead:    clamp(1.05rem, 0.98rem + 0.38vw, 1.28rem);
+  --fs-body:    1rem;
+  --fs-body-lg: 1.0625rem;
+  --fs-sm:      0.9375rem;
+  --fs-xs:      0.8125rem;
+  --fs-h5:      1rem;
+  --fs-eyebrow: 0.75rem;
+  --fs-micro:   0.6875rem;
+
+  --lh-tight: 1.08;
+  --lh-heading: 1.14;
+  --lh-snug:  1.28;
+  --lh-body:  1.72;
+
+  --tracking-tight:   -0.022em;
+  --tracking-display: -0.03em;
+  --tracking-normal:  0;
+  --tracking-eyebrow: 0.16em;
+
+  /* ---- Spacing (4px base) ---- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 2.5rem;
+  --space-8: 3rem;
+  --space-9: 4rem;
+  --space-10: 5rem;
+  --space-11: 6.5rem;
+
+  /* Vertical rhythm between major page sections */
+  --section-y: clamp(4rem, 2.2rem + 6.4vw, 7.5rem);
+  --section-y-tight: clamp(3rem, 2rem + 3.6vw, 4.75rem);
+
+  /* ---- Layout ---- */
+  --container: 1200px;
+  --container-narrow: 820px;
+  --container-wide: 1400px;
+  --gutter: clamp(1.15rem, 0.7rem + 2.2vw, 2.5rem);
+  --header-h: 76px;
+
+  /* ---- Radii ---- */
+  --r-xs:  6px;
+  --r-sm:  10px;
+  --r-md:  14px;
+  --r-lg:  20px;
+  --r-xl:  28px;
+  --r-2xl: 36px;
+  --r-pill: 999px;
+
+  /* ---- Elevation — navy-tinted so shadows read as brand, not soot ---- */
+  --shadow-xs: 0 1px 2px rgba(16, 22, 80, 0.06);
+  --shadow-sm: 0 2px 6px rgba(16, 22, 80, 0.06), 0 1px 2px rgba(16, 22, 80, 0.04);
+  --shadow-md: 0 8px 20px rgba(16, 22, 80, 0.08), 0 2px 6px rgba(16, 22, 80, 0.04);
+  --shadow-lg: 0 18px 40px rgba(16, 22, 80, 0.11), 0 4px 12px rgba(16, 22, 80, 0.05);
+  --shadow-xl: 0 30px 68px rgba(16, 22, 80, 0.16), 0 8px 20px rgba(16, 22, 80, 0.06);
+  --shadow-brand: 0 12px 28px rgba(26, 115, 232, 0.28);
+  --shadow-gold: 0 12px 28px rgba(255, 152, 0, 0.26);
+
+  /* ---- Motion ---- */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
+  --dur-fast: 160ms;
+  --dur-mid: 280ms;
+  --dur-slow: 560ms;
+  --dur-reveal: 640ms;
+  --dur-drawer: 380ms;
+
+  --z-header: 100;
+  --z-drawer: 200;
+  --z-modal: 300;
+}

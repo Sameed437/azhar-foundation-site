@@ -1,0 +1,678 @@
+/* ==========================================================================
+   Base — reset, elements, shared primitives
+   ========================================================================== */
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+* { margin: 0; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scrollbar-color: var(--navy-300) var(--ink-50);
+  scroll-behavior: smooth;
+  scroll-padding-top: calc(var(--header-h) + 1.5rem);
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  color: var(--text-body);
+  background-color: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+img,
+picture,
+svg,
+video {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+button { cursor: pointer; }
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  color: var(--text-strong);
+  font-weight: 700;
+  line-height: var(--lh-snug);
+  letter-spacing: var(--tracking-tight);
+  text-wrap: balance;
+}
+
+h1 { font-size: var(--fs-h1); line-height: var(--lh-tight); }
+h2 { font-size: var(--fs-h2); line-height: var(--lh-heading); }
+h3 { font-size: var(--fs-h3); }
+h4 { font-size: var(--fs-h4); }
+
+p { text-wrap: pretty; }
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+a:hover { color: var(--accent-hover); }
+
+ul, ol { padding: 0; list-style: none; }
+
+/* ---- Focus: always visible, never clipped ---- */
+:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 3px;
+  border-radius: var(--r-xs);
+}
+
+::selection {
+  background: var(--blue-200);
+  color: var(--navy-800);
+}
+
+/* ---- Skip link ---- */
+.skip-link {
+  position: absolute;
+  top: 0;
+  left: var(--gutter);
+  z-index: calc(var(--z-header) + 10);
+  transform: translateY(-120%);
+  padding: 0.7rem 1.2rem;
+  background: var(--navy-700);
+  color: #fff;
+  border-radius: 0 0 var(--r-sm) var(--r-sm);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+
+.skip-link:focus-visible {
+  transform: translateY(0);
+  color: #fff;
+}
+
+/* ==========================================================================
+   Layout primitives
+   ========================================================================== */
+
+.container {
+  width: 100%;
+  max-width: var(--container);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.container--narrow { max-width: var(--container-narrow); }
+.container--wide { max-width: var(--container-wide); }
+
+.section { padding-block: var(--section-y); }
+.section--tight { padding-block: var(--section-y-tight); }
+
+.section--sunken {
+  /* ink-500 muted text falls under AA on this deeper surface - step it down */
+  --text-muted: var(--ink-600);
+  background: var(--bg-sunken);
+  border-block: 1px solid var(--navy-100);
+}
+.section--elevated { background: var(--bg-elevated); }
+
+/* Dark sections invert the whole type scale and carry shared ambience:
+   a cool overhead glow plus a faint blueprint grid fading toward the base. */
+.section--dark {
+  position: relative;
+  isolation: isolate;
+  background:
+    radial-gradient(1100px 480px at 50% -120px, rgba(26, 115, 232, 0.16), transparent 70%)
+    var(--bg-inverse);
+  color: var(--text-on-dark-muted);
+}
+
+.section--dark::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 64px 64px;
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, transparent 72%);
+  mask-image: linear-gradient(to bottom, #000 0%, transparent 72%);
+  pointer-events: none;
+}
+
+.section--dark h1,
+.section--dark h2,
+.section--dark h3,
+.section--dark h4 { color: #fff; }
+
+/* ==========================================================================
+   Section headings
+   ========================================================================== */
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--font-display);
+  font-size: var(--fs-eyebrow);
+  font-weight: 700;
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--accent-text);
+  margin-bottom: var(--space-4);
+}
+
+/* The "foundation courses" mark - three stacked strokes, like brick courses,
+   drawn from the motto. The site's one repeating signature. */
+.eyebrow::before,
+.section-head--center .eyebrow::after {
+  content: "";
+  width: 22px;
+  height: 8px;
+  flex: none;
+  background:
+    linear-gradient(var(--navy-800), var(--navy-800)) 0 0 / 14px 2px,
+    linear-gradient(var(--blue-500), var(--blue-500)) 0 3px / 22px 2px,
+    linear-gradient(var(--gold-500), var(--gold-500)) 0 6px / 9px 2px;
+  background-repeat: no-repeat;
+}
+
+.section-head--center .eyebrow::after { transform: scaleX(-1); }
+
+.section--dark .eyebrow::before,
+.section--dark .section-head--center .eyebrow::after {
+  background:
+    linear-gradient(var(--sky-200), var(--sky-200)) 0 0 / 14px 2px,
+    linear-gradient(var(--sky-400), var(--sky-400)) 0 3px / 22px 2px,
+    linear-gradient(var(--gold-400), var(--gold-400)) 0 6px / 9px 2px;
+  background-repeat: no-repeat;
+}
+
+.section--dark .eyebrow { color: var(--sky-300); }
+
+.section-head {
+  max-width: 38rem;
+  margin-bottom: clamp(2.25rem, 1.6rem + 2.2vw, 3.5rem);
+}
+
+.section-head--center {
+  margin-inline: auto;
+  text-align: center;
+}
+
+.section-head--center .eyebrow { justify-content: center; }
+
+.section-head p {
+  margin-top: var(--space-4);
+  font-size: var(--fs-lead);
+  color: var(--text-muted);
+  line-height: 1.66;
+}
+
+.section--dark .section-head p { color: var(--text-on-dark-muted); }
+
+/* ==========================================================================
+   Buttons
+   ========================================================================== */
+
+.btn {
+  --btn-bg: var(--accent);
+  --btn-fg: #fff;
+  --btn-border: transparent;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 0.875rem 1.6rem;
+  border: 1px solid var(--btn-border);
+  border-radius: var(--r-pill);
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  font-family: var(--font-display);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  letter-spacing: 0.005em;
+  line-height: 1.2;
+  white-space: nowrap;
+  transition: transform var(--dur-fast) var(--ease-out),
+              box-shadow var(--dur-mid) var(--ease-out),
+              background-color var(--dur-fast) var(--ease-out),
+              border-color var(--dur-fast) var(--ease-out),
+              color var(--dur-fast) var(--ease-out);
+}
+
+.btn:hover {
+  color: var(--btn-fg);
+  transform: translateY(-2px);
+}
+
+.btn:active { transform: translateY(0); }
+
+.btn--primary { box-shadow: var(--shadow-brand); }
+
+.btn--primary:hover:not(:disabled) {
+  --btn-bg: var(--accent-hover);
+  box-shadow: 0 16px 34px rgba(26, 115, 232, 0.34);
+}
+
+.btn--gold {
+  --btn-bg: var(--gold-500);
+  --btn-fg: var(--navy-900);
+  box-shadow: var(--shadow-gold);
+}
+
+.btn--gold:hover:not(:disabled) { --btn-bg: var(--gold-400); }
+
+.btn--ghost {
+  --btn-bg: transparent;
+  --btn-fg: var(--navy-600);
+  --btn-border: var(--border-strong);
+}
+
+.btn--ghost:hover:not(:disabled) {
+  --btn-bg: var(--navy-50);
+  --btn-border: var(--navy-300);
+}
+
+.btn--on-dark {
+  --btn-bg: rgba(255, 255, 255, 0.08);
+  --btn-fg: #fff;
+  --btn-border: rgba(255, 255, 255, 0.28);
+  backdrop-filter: blur(8px);
+}
+
+.btn--on-dark:hover:not(:disabled) {
+  --btn-bg: rgba(255, 255, 255, 0.16);
+  --btn-border: rgba(255, 255, 255, 0.5);
+}
+
+.btn--light {
+  --btn-bg: #fff;
+  --btn-fg: var(--navy-700);
+  box-shadow: var(--shadow-md);
+}
+
+.btn--light:hover:not(:disabled) { --btn-bg: var(--blue-50); }
+
+.btn--lg { padding: 1.02rem 2rem; font-size: var(--fs-body); }
+.btn--sm { padding: 0.6rem 1.1rem; font-size: var(--fs-xs); }
+.btn--block { width: 100%; }
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn__arrow {
+  transition: transform var(--dur-mid) var(--ease-out);
+  flex: none;
+}
+
+.btn:hover .btn__arrow { transform: translateX(4px); }
+
+/* Text link with animated arrow */
+.link-arrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--fs-sm);
+  color: var(--accent-text);
+}
+
+.link-arrow svg { transition: transform var(--dur-mid) var(--ease-out); }
+.link-arrow:hover svg { transform: translateX(4px); }
+
+/* ==========================================================================
+   Cards & surfaces
+   ========================================================================== */
+
+.card {
+  position: relative;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--dur-mid) var(--ease-out),
+              box-shadow var(--dur-mid) var(--ease-out),
+              border-color var(--dur-mid) var(--ease-out);
+}
+
+.card--interactive:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--blue-200);
+}
+
+/* A white card on a white section disappears - strengthen its edges there */
+.section--elevated .card {
+  border-color: var(--border);
+  box-shadow: var(--shadow-md);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.4rem 0.85rem;
+  border-radius: var(--r-pill);
+  background: var(--blue-50);
+  color: var(--blue-700);
+  font-family: var(--font-display);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.chip--gold { background: var(--gold-100); color: #8a4e00; }
+
+.chip--on-dark {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(8px);
+}
+
+/* Decorative icon tile used across feature/contact cards */
+.icon-tile {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  flex: none;
+  border-radius: var(--r-md);
+  background: var(--blue-50);
+  color: var(--blue-600);
+  transition: background-color var(--dur-mid) var(--ease-out),
+              color var(--dur-mid) var(--ease-out);
+}
+
+.icon-tile--gold { background: var(--gold-100); color: var(--gold-700); }
+.icon-tile--navy { background: var(--navy-50); color: var(--navy-600); }
+
+.icon-tile--on-dark {
+  background: rgba(255, 255, 255, 0.09);
+  color: var(--sky-300);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+/* ==========================================================================
+   Decorative backgrounds
+   ========================================================================== */
+
+/* Soft dotted grid — used behind light sections */
+.bg-dots {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle at center, var(--ink-200) 1px, transparent 1px);
+  background-size: 26px 26px;
+  opacity: 0.55;
+  pointer-events: none;
+  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, #000 30%, transparent 78%);
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, #000 30%, transparent 78%);
+}
+
+/* Blurred colour orb — depth without imagery */
+.bg-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(72px);
+  opacity: 0.42;
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   Scroll reveal
+   ========================================================================== */
+
+/* Hidden state only applies when JS is running (html.js is stamped in
+   index.html), so crawlers, print and no-JS users get full content.
+   Keyframes - not transitions - so entrance never competes with the
+   transition shorthands components use for hover. */
+html.js .reveal { opacity: 0; }
+
+html.js .reveal[data-visible="true"] {
+  opacity: 1;
+  animation: reveal-up var(--dur-reveal) var(--ease-out) backwards;
+  animation-delay: var(--reveal-delay, 0ms);
+}
+
+html.js .reveal--left[data-visible="true"] { animation-name: reveal-left; }
+html.js .reveal--right[data-visible="true"] { animation-name: reveal-right; }
+html.js .reveal--scale[data-visible="true"] { animation-name: reveal-scale; }
+html.js .reveal--fade[data-visible="true"] { animation-name: reveal-fade; }
+
+@keyframes reveal-up {
+  from { opacity: 0; transform: translateY(26px); }
+}
+
+@keyframes reveal-left {
+  from { opacity: 0; transform: translateX(-32px); }
+}
+
+@keyframes reveal-right {
+  from { opacity: 0; transform: translateX(32px); }
+}
+
+@keyframes reveal-scale {
+  from { opacity: 0; transform: scale(0.94); }
+}
+
+@keyframes reveal-fade {
+  from { opacity: 0; }
+}
+
+/* Shared entrance for hero/masthead content on page load */
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(18px); }
+}
+
+/* ==========================================================================
+   Accessibility helpers
+   ========================================================================== */
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    transition-delay: 0s !important;
+    scroll-behavior: auto !important;
+  }
+
+  html.js .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+  }
+}
+
+/* Subordinate affix beside a display numeral (+, %, :1) */
+.stat-suffix {
+  font-size: 0.58em;
+  font-weight: 700;
+  color: var(--blue-500);
+  margin-left: 0.06em;
+}
+
+/* ==========================================================================
+   Media grading — one colour temperature for every phone photo
+   ========================================================================== */
+
+.media-graded {
+  position: relative;
+}
+
+.media-graded img {
+  filter: saturate(0.82) contrast(1.05) brightness(1.01);
+}
+
+.media-graded::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(160deg, rgba(26, 35, 126, 0.16), rgba(13, 71, 161, 0.04) 55%, rgba(16, 22, 80, 0.1));
+  mix-blend-mode: multiply;
+  border-radius: inherit;
+}
+
+/* ==========================================================================
+   Crest ghost — the school mark as a watermark in dark panels
+   ========================================================================== */
+
+.crest-mark {
+  position: absolute;
+  right: -6%;
+  top: -10%;
+  width: clamp(300px, 30vw, 480px);
+  opacity: 0.05;
+  filter: grayscale(1) brightness(2.4);
+  mix-blend-mode: screen;
+  pointer-events: none;
+  user-select: none;
+  -webkit-mask-image: radial-gradient(closest-side, #000 55%, transparent);
+  mask-image: radial-gradient(closest-side, #000 55%, transparent);
+}
+
+/* ==========================================================================
+   Closing CTA panel — one recipe bookends every page, straddling the footer
+   seam the way the home stat-bar straddles the hero
+   ========================================================================== */
+
+.cta-section {
+  padding-block: var(--section-y-tight) 0;
+}
+
+.cta-panel {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-7);
+  padding: clamp(2.25rem, 1.4rem + 3.4vw, 3.75rem);
+  margin-bottom: calc(var(--section-y) * -0.5);
+  border-radius: var(--r-xl);
+  background: var(--navy-800);
+  box-shadow: var(--shadow-xl);
+  color: rgba(255, 255, 255, 0.78);
+  z-index: 2;
+}
+
+/* Tight warm highlight + a broad cool orb - never khaki mud */
+.cta-panel::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: -120px;
+  right: 8%;
+  width: 340px;
+  height: 340px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 171, 46, 0.18), transparent 60%);
+  filter: blur(36px);
+  pointer-events: none;
+}
+
+.cta-panel::after {
+  content: "";
+  position: absolute;
+  z-index: -2;
+  bottom: -260px;
+  left: -140px;
+  width: 640px;
+  height: 640px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(26, 115, 232, 0.35), transparent 66%);
+  filter: blur(48px);
+  pointer-events: none;
+}
+
+.cta-panel .eyebrow { color: var(--gold-300); }
+.cta-panel h2 { color: #fff; }
+
+.cta-panel__text {
+  margin-top: var(--space-4);
+  max-width: 44ch;
+  font-size: var(--fs-lead);
+  line-height: 1.66;
+}
+
+.cta-panel__actions {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-self: end;
+  gap: var(--space-4);
+}
+
+.cta-panel__actions .btn { justify-content: center; }
+
+@media (max-width: 900px) {
+  .cta-panel { grid-template-columns: 1fr; }
+
+  .cta-panel__actions {
+    justify-self: stretch;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 560px) {
+  .cta-panel__actions { flex-direction: column; }
+
+  .cta-panel__actions .btn { width: 100%; }
+}
+
+/* ==========================================================================
+   Form autofill — keep the branded field surface
+   ========================================================================== */
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px var(--white) inset;
+  -webkit-text-fill-color: var(--ink-900);
+  caret-color: var(--ink-900);
+  transition: background-color 9999s ease-out;
+}

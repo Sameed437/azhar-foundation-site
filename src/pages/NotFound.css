@@ -1,0 +1,64 @@
+.notfound {
+  display: grid;
+  place-items: center;
+  min-height: calc(100dvh - var(--header-h));
+  padding-block: var(--section-y);
+  background:
+    radial-gradient(ellipse 60% 50% at 50% 0%, var(--blue-50), transparent 70%),
+    var(--bg);
+}
+
+.notfound__inner {
+  max-width: 44rem;
+  text-align: center;
+}
+
+/* The foundation-courses mark, standing alone above the code */
+.notfound__mark {
+  width: 22px;
+  height: 8px;
+  margin-inline: auto;
+  margin-bottom: var(--space-4);
+  background:
+    linear-gradient(var(--navy-800), var(--navy-800)) 0 0 / 14px 2px,
+    linear-gradient(var(--blue-500), var(--blue-500)) 0 3px / 22px 2px,
+    linear-gradient(var(--gold-500), var(--gold-500)) 0 6px / 9px 2px;
+  background-repeat: no-repeat;
+}
+
+.notfound__code {
+  display: block;
+  font-family: var(--font-display);
+  font-size: clamp(5rem, 3rem + 12vw, 10rem);
+  font-weight: 800;
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  background: var(--grad-brand);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin-bottom: var(--space-5);
+}
+
+.notfound h1 {
+  font-size: clamp(1.5rem, 1.2rem + 1.5vw, 2.15rem);
+  margin-bottom: var(--space-4);
+}
+
+.notfound p {
+  font-size: var(--fs-lead);
+  line-height: 1.7;
+  color: var(--text-muted);
+  max-width: 44ch;
+  margin-inline: auto;
+}
+
+.notfound__links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-3);
+  margin-top: var(--space-7);
+}
+
+.notfound__home { margin-top: var(--space-6); }

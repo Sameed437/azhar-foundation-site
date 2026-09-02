@@ -1,55 +1,301 @@
-.login-container {
-  max-width: 400px;
-  margin: 50px auto;
-  padding: 30px;
-  border-radius: 10px;
-  background: #f4f9ff;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  text-align: center;
+.login {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  min-height: calc(100dvh - var(--header-h));
 }
 
-.logo-section {
-  margin-bottom: 20px;
+@media (max-width: 940px) {
+  .login { grid-template-columns: 1fr; }
 }
 
-.logo {
-  width: 100px;
-  margin-bottom: 10px;
+/* ==========================================================================
+   BRAND PANEL
+   ========================================================================== */
+
+.login__aside {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  padding: clamp(2.5rem, 1.6rem + 3.6vw, 4.5rem) var(--gutter);
+  background: var(--navy-900);
+  color: var(--text-on-dark-muted);
 }
 
-.login-container h1 {
-  font-size: 22px;
-  margin: 0;
-  color: #1a237e;
+.login__aside-glow {
+  position: absolute;
+  z-index: -1;
+  top: -20%;
+  left: -20%;
+  width: 640px;
+  height: 640px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(26, 115, 232, 0.42), transparent 68%);
+  filter: blur(50px);
 }
 
-.motto {
-  font-style: italic;
-  color: #3f51b5;
-  font-size: 14px;
+/* Crest ghost sits bottom-right here so it clears the brand block up top */
+.login__aside .crest-mark {
+  top: auto;
+  bottom: -12%;
 }
 
-.login-container input {
+.login__aside-inner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  max-width: 30rem;
+  margin-left: auto;
   width: 100%;
-  padding: 12px;
-  margin: 10px 0;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  box-sizing: border-box;
 }
 
-.login-container button {
+@media (max-width: 940px) {
+  .login__aside-inner { margin-left: 0; max-width: none; gap: var(--space-6); }
+}
+
+.login__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8rem;
+  color: #fff;
+}
+
+.login__brand img {
+  width: 52px;
+  height: 52px;
+  object-fit: contain;
+  flex: none;
+}
+
+.login__brand span { display: flex; flex-direction: column; }
+
+.login__brand strong {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: var(--tracking-tight);
+  line-height: 1.25;
+}
+
+.login__brand em {
+  font-style: normal;
+  font-size: var(--fs-micro);
+  font-weight: 600;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--sky-300);
+}
+
+.login__pitch h2 {
+  color: #fff;
+  font-size: clamp(1.5rem, 1.2rem + 1.3vw, 2.1rem);
+  margin-bottom: var(--space-4);
+}
+
+.login__pitch p {
+  font-size: var(--fs-sm);
+  line-height: 1.78;
+  max-width: 42ch;
+}
+
+.login__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
+}
+
+.login__list li {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  font-size: var(--fs-sm);
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.login__list svg { color: var(--sky-400); flex: none; }
+
+.login__aside-foot {
+  font-size: var(--fs-xs);
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.5);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--border-on-dark);
+}
+
+@media (max-width: 940px) {
+  .login__aside-foot { display: none; }
+}
+
+/* ==========================================================================
+   FORM PANEL
+   ========================================================================== */
+
+.login__panel {
+  display: flex;
+  align-items: center;
+  padding: clamp(2.5rem, 1.6rem + 3.6vw, 4.5rem) var(--gutter);
+  background: var(--bg);
+}
+
+.login__card {
   width: 100%;
-  padding: 12px;
-  background-color: #1a73e8;
-  color: white;
+  max-width: 27rem;
+  margin-right: auto;
+  padding: var(--space-7);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow-lg);
+}
+
+@media (max-width: 940px) {
+  .login__card { margin-inline: auto; }
+}
+
+@media (max-width: 480px) {
+  .login__card { padding: var(--space-5); }
+}
+
+.login__card h1 {
+  font-size: clamp(1.5rem, 1.25rem + 1vw, 1.9rem);
+  margin-bottom: 0.5rem;
+}
+
+.login__sub {
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+  margin-bottom: var(--space-6);
+}
+
+.login__card form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+/* Field styles mirror the contact form so inputs feel identical site-wide */
+.login__card .field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.login__card label {
+  font-family: var(--font-display);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--ink-800);
+}
+
+.field__label-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.field__toggle {
   border: none;
-  font-weight: bold;
-  cursor: pointer;
-  border-radius: 6px;
-  transition: background-color 0.3s ease;
+  background: none;
+  padding: 0.25rem 0.4rem;
+  margin: -0.25rem -0.4rem;
+  border-radius: var(--r-xs);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--accent-text);
+  transition: background-color var(--dur-fast) var(--ease-out);
 }
 
-.login-container button:hover {
-  background-color: #0c47a1;
+.field__toggle:hover { background: var(--blue-50); }
+
+.login__card input {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: var(--white);
+  font-size: var(--fs-sm);
+  color: var(--ink-900);
+  transition: border-color var(--dur-fast) var(--ease-out),
+              box-shadow var(--dur-fast) var(--ease-out);
 }
+
+.login__card input::placeholder { color: var(--ink-400); }
+.login__card input:hover { border-color: var(--border-strong); }
+
+.login__card input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.16);
+}
+
+/* ---- Alerts ---- */
+
+.login__alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  padding: 0.8rem 1rem;
+  margin-bottom: var(--space-5);
+  border-radius: var(--r-sm);
+  font-size: var(--fs-sm);
+  line-height: 1.55;
+  border: 1px solid;
+}
+
+.login__alert svg { flex: none; margin-top: 0.2em; }
+
+.login__alert--error {
+  background: var(--danger-50);
+  border-color: var(--danger-100);
+  color: var(--danger-600);
+}
+
+.login__alert--success {
+  background: var(--success-50);
+  border-color: var(--success-100);
+  color: var(--success-600);
+}
+
+/* Neutral, honest notice — the portal has no self-serve sign-up */
+.login__alert--info {
+  background: var(--navy-50);
+  border-color: var(--navy-100);
+  color: var(--navy-600);
+}
+
+.login__alert--info a {
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  color: inherit;
+}
+
+/* ---- Footer links ---- */
+
+.login__help {
+  margin-top: var(--space-5);
+  font-size: var(--fs-xs);
+  line-height: 1.7;
+  color: var(--text-muted);
+}
+
+.login__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: var(--space-6);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--border-soft);
+  width: 100%;
+  font-family: var(--font-display);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--ink-600);
+}
+
+.login__back:hover { color: var(--accent-text); }
+
+.login__alert--empty { display: none; }

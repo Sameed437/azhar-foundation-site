@@ -2,42 +2,185 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
+    <meta name="theme-color" content="#1a237e" />
+
+    <title>Azhar Foundation School — Excellence in Education Since 2001</title>
     <meta
       name="description"
-      content="Web site created using create-react-app"
+      content="Azhar Foundation School, Allama Iqbal Town, Lahore. Quality education from Playgroup to Matriculation since 2001, with smart classrooms, qualified faculty and a 95% board success rate."
     />
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
-    <!--
-      manifest.json provides metadata used when your web app is installed on a
-      user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
-    -->
-    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <!--
-      Notice the use of %PUBLIC_URL% in the tags above.
-      It will be replaced with the URL of the `public` folder during the build.
-      Only files inside the `public` folder can be referenced from the HTML.
+    <meta name="author" content="Azhar Foundation School" />
+    <link rel="canonical" href="https://azhar-foundation-site.vercel.app/" />
 
-      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
-      work correctly both with client-side routing and a non-root public URL.
-      Learn how to configure a non-root public URL by running `npm run build`.
-    -->
-    <title>Azhar Foundation School</title>
+    <!-- Social sharing: WhatsApp and Facebook are the primary referral
+         channels, and both need an absolute image URL -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Azhar Foundation School" />
+    <meta property="og:title" content="Azhar Foundation School — Excellence in Education Since 2001" />
+    <meta
+      property="og:description"
+      content="Quality education from Playgroup to Matriculation in Allama Iqbal Town, Lahore. Admissions open."
+    />
+    <meta property="og:url" content="https://azhar-foundation-site.vercel.app/" />
+    <meta property="og:image" content="https://azhar-foundation-site.vercel.app/images/og-card.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Azhar Foundation School crest — The Foundation Builders, Lahore" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- Icons & manifest -->
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+
+    <!-- Brand typefaces -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Hero artwork is above the fold on every page -->
+    <link
+      rel="preload"
+      as="image"
+      type="image/webp"
+      imagesrcset="%PUBLIC_URL%/images/banner-900.webp 900w, %PUBLIC_URL%/images/banner-1600.webp 1600w"
+      imagesizes="100vw"
+    />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "School",
+        "name": "Azhar Foundation School",
+        "slogan": "The Foundation Builders",
+        "foundingDate": "2001",
+        "url": "https://azhar-foundation-site.vercel.app/",
+        "logo": "https://azhar-foundation-site.vercel.app/images/logo.png",
+        "image": "https://azhar-foundation-site.vercel.app/images/og-card.jpg",
+        "telephone": "+92 300 4296150",
+        "email": "msameedch437@gmail.com",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "437 Karim Block, Allama Iqbal Town",
+          "addressLocality": "Lahore",
+          "addressRegion": "Punjab",
+          "addressCountry": "PK"
+        },
+        "openingHoursSpecification": [
+          {
+            "@type": "OpeningHoursSpecification",
+            "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+            "opens": "08:00",
+            "closes": "14:00"
+          },
+          {
+            "@type": "OpeningHoursSpecification",
+            "dayOfWeek": "Saturday",
+            "opens": "08:00",
+            "closes": "12:00"
+          }
+        ]
+      }
+    </script>
+
+    <!-- Keep these questions in sync with `faqs` in src/data/site.js -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "When does the admission season open?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Main admissions run from March through August for the August session. Mid-year admissions are considered against available seats."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the class size at Azhar Foundation School?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Sections are capped at roughly 25 students so every child gets individual attention. Early Years groups are smaller still."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Which board do matric students appear under?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Students sit the Board of Intermediate and Secondary Education, Lahore examinations, in either the Science or Arts group."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Are scholarships available?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Merit scholarships are offered to high achievers in board and annual examinations, and sibling concessions apply to families with more than one child enrolled."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What are the school timings?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Classes run 8:00 AM to 2:00 PM Monday through Friday, with a shorter Saturday for selected sections. The office is open 8:00 AM to 2:00 PM on weekdays."
+            }
+          }
+        ]
+      }
+    </script>
+
+    <style>
+      /* Static splash shown until the bundle hydrates - matters on 3G */
+      .boot-splash {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 18px;
+        background: #f4f6f9;
+        font-family: "Segoe UI", system-ui, sans-serif;
+      }
+      .boot-splash img {
+        width: 84px;
+        height: 84px;
+        animation: boot-pulse 1.6s ease-in-out infinite;
+      }
+      .boot-splash span {
+        font-size: 14px;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #33409f;
+      }
+      @keyframes boot-pulse {
+        0%, 100% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(0.92); opacity: 0.7; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .boot-splash img { animation: none; }
+      }
+    </style>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root"></div>
-    <!--
-      This HTML file is a template.
-      If you open it directly in the browser, you will see an empty page.
-
-      You can add webfonts, meta tags, or analytics to this file.
-      The build step will place the bundled scripts into the <body> tag.
-
-      To begin the development, run `npm start` or `yarn start`.
-      To create a production bundle, use `npm run build` or `yarn build`.
-    -->
+    <!-- Stamp the JS gate before paint so .reveal's hidden state never
+         applies for crawlers, print, or failed bundles -->
+    <script>document.documentElement.classList.add('js');</script>
+    <div id="root">
+      <div class="boot-splash" aria-hidden="true">
+        <img src="%PUBLIC_URL%/images/logo.png" alt="" />
+        <span>Azhar Foundation School</span>
+      </div>
+    </div>
   </body>
 </html>
