@@ -6,6 +6,7 @@ import Reveal from '../components/Reveal';
 import Gallery from '../components/Gallery';
 import TopperGrid from '../components/TopperGrid';
 import {
+  academy,
   admissionsSession,
   features,
   gallery,
@@ -67,7 +68,7 @@ const Home = () => (
           <ul className="hero__proof">
             <li>
               <Icon name="shield" size={18} />
-              <span>Registered with {school.board}</span>
+              <span>Registered school</span>
             </li>
             <li>
               <Icon name="clock" size={18} />
@@ -178,6 +179,46 @@ const Home = () => (
       </div>
     </section>
 
+    {/* ==================== EVENING ACADEMY ==================== */}
+    <section className="section section--tight academy" id="academy">
+      <div className="container">
+        <Reveal variant="scale" className="academy__panel">
+          <div className="academy__mark" aria-hidden="true">
+            <span className="academy__year">{academy.since}</span>
+            <Icon name="clock" size={26} />
+          </div>
+
+          <div className="academy__body">
+            <p className="eyebrow">After school hours</p>
+            <h2>{academy.name}</h2>
+
+            <ul className="academy__chips">
+              <li className="chip chip--gold">Since {academy.since}</li>
+              <li className="chip">{academy.timing}</li>
+            </ul>
+
+            <p className="academy__text">{academy.description}</p>
+          </div>
+
+          <div className="academy__actions">
+            <a href={school.phoneHref} className="btn btn--primary">
+              <Icon name="phone" size={17} />
+              Ask about timings
+            </a>
+            <a
+              href={school.whatsappHref}
+              target="_blank"
+              rel="noreferrer"
+              className="btn btn--ghost"
+            >
+              <Icon name="whatsapp" size={17} />
+              WhatsApp us
+            </a>
+          </div>
+        </Reveal>
+      </div>
+    </section>
+
     {/* ==================== RESULTS ==================== */}
     <section className="section results section--dark">
       <img src="/images/logo.png" alt="" aria-hidden="true" className="crest-mark" />
@@ -226,7 +267,7 @@ const Home = () => (
             </blockquote>
 
             <div className="message__signature">
-              <span className="message__name">Ch. Azhar Mehmood</span>
+              <span className="message__name">Ch. Muhammad Siddiq</span>
               <span className="message__role">Patron-in-Chief &amp; Founder</span>
             </div>
           </div>

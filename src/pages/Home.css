@@ -324,6 +324,98 @@
 }
 
 /* ==========================================================================
+   EVENING ACADEMY — the 1997 sister institution
+   ========================================================================== */
+
+.academy__panel {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: clamp(1.5rem, 1rem + 2vw, 2.75rem);
+  padding: clamp(1.75rem, 1.2rem + 2.4vw, 2.75rem);
+  border-radius: var(--r-xl);
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--gold-500);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Ghost year with a small clock - the "evening" identity */
+.academy__mark {
+  position: relative;
+  display: grid;
+  place-items: center;
+  align-self: start;
+  padding-top: 0.4rem;
+}
+
+.academy__year {
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 2.4rem + 2.4vw, 4.25rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: var(--tracking-display);
+  color: var(--gold-100);
+  -webkit-text-stroke: 1.5px var(--gold-400);
+}
+
+.academy__mark svg {
+  position: absolute;
+  right: -8px;
+  bottom: -4px;
+  color: var(--gold-600);
+  background: var(--white);
+  border-radius: 50%;
+  padding: 3px;
+  box-shadow: var(--shadow-sm);
+}
+
+.academy__body h2 { font-size: var(--fs-h3); }
+
+.academy__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: var(--space-3) 0 var(--space-4);
+}
+
+.academy__text {
+  max-width: 58ch;
+  font-size: var(--fs-sm);
+  line-height: 1.74;
+  color: var(--text-muted);
+}
+
+.academy__actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+@media (max-width: 900px) {
+  .academy__panel { grid-template-columns: auto minmax(0, 1fr); }
+
+  .academy__actions {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 560px) {
+  .academy__panel { grid-template-columns: 1fr; }
+
+  .academy__mark {
+    justify-self: start;
+    padding-top: 0;
+  }
+
+  .academy__actions { flex-direction: column; }
+
+  .academy__actions .btn { width: 100%; }
+}
+
+/* ==========================================================================
    RESULTS
    ========================================================================== */
 

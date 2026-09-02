@@ -29,6 +29,18 @@ export const school = {
     'https://www.google.com/maps/search/?api=1&query=437+Karim+Block,+Allama+Iqbal+Town,+Lahore',
 };
 
+/**
+ * The evening sister institution, run by the same founders since 1997 —
+ * four years before the school itself opened.
+ */
+export const academy = {
+  name: 'Anwar Memorial Academy',
+  since: 1997,
+  description:
+    'Alongside the school day, our founders have run Anwar Memorial Academy since 1997 — evening tuition classes at the same campus, for students who want focused, supervised study after regular school hours.',
+  timing: 'Evening classes, after school hours',
+};
+
 /** "2026–27" style session label, rolling over each March. */
 export const admissionsSession = (date = new Date()) => {
   const year = date.getMonth() >= 2 ? date.getFullYear() : date.getFullYear() - 1;
@@ -210,6 +222,11 @@ export const values = [
 /** Milestones for the About page timeline. */
 export const milestones = [
   {
+    year: '1997',
+    title: 'Anwar Memorial Academy',
+    text: 'Our founders begin teaching with an evening tuition academy — four years before the school opens. It still runs every evening today.',
+  },
+  {
     year: '2001',
     title: 'The school opens',
     text: 'Azhar Foundation School is established in Allama Iqbal Town with a single primary section.',
@@ -327,7 +344,7 @@ export const curriculum = [
     icon: 'cap',
     core: ['English', 'Urdu', 'Mathematics', 'Islamiyat', 'Pakistan Studies'],
     plus: ['Science group: Physics, Chemistry, Biology / Computer Science', 'Arts group: General Science, Civics, Economics'],
-    note: 'Registered with BISE Lahore. Monthly mock papers from Grade 9 onward.',
+    note: 'Registered for board examinations. Monthly mock papers from Grade 9 onward.',
   },
 ];
 

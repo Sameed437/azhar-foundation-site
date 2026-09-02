@@ -27,10 +27,15 @@ const About = () => (
           <h2>From a single primary section to a full Matriculation school</h2>
 
           <p>
-            {school.name} opened its doors in {school.foundedYear} in Allama Iqbal Town with a
-            handful of classrooms and one conviction — that a child&rsquo;s early years decide
-            everything that follows. We started with primary grades only, and grew deliberately,
-            adding a stage at a time and never faster than we could staff it properly.
+            Our story begins before the school itself: since 1997 our founders have run{' '}
+            <strong>Anwar Memorial Academy</strong>, an evening tuition academy that still
+            teaches every evening today. {school.name} followed in {school.foundedYear}, opening
+            its doors in Allama Iqbal Town with a handful of classrooms and one conviction —
+            that a child&rsquo;s early years decide everything that follows.
+          </p>
+          <p>
+            We started with primary grades only, and grew deliberately, adding a stage at a
+            time and never faster than we could staff it properly.
           </p>
           <p>
             Today we teach from Playgroup through Grade 10, with subject specialists at the

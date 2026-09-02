@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Icon from './Icon';
-import { school } from '../data/site';
+import { academy, school } from '../data/site';
 import './Footer.css';
 
 const socials = [
@@ -57,7 +57,9 @@ const Footer = () => (
 
         <p className="footer-brand__blurb">
           A Lahore school building confident, capable and grounded students since{' '}
-          {school.foundedYear} — from Playgroup right through to Matriculation.
+          {school.foundedYear} — from Playgroup right through to Matriculation. Also home
+          of <a href="/#academy">{academy.name}</a>, our evening tuition academy running
+          since {academy.since}.
         </p>
 
         <ul className="footer-social">
@@ -121,7 +123,7 @@ const Footer = () => (
         © {new Date().getFullYear()} {school.name}. All rights reserved.
       </p>
       <p className="site-footer__meta">
-        {school.address} · Registered with {school.board}
+        {school.address} · Registered
       </p>
     </div>
   </footer>
