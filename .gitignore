@@ -30,3 +30,6 @@ afs-fee-backup-*.json
 /supabase.txt
 *.credentials
 *password*
+
+# Personal/school data lives here - never committed
+/private/
