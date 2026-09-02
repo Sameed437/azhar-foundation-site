@@ -26,6 +26,7 @@ const FeeSheet = () => {
   const [query, setQuery] = useState('');
   const [klass, setKlass] = useState('');
   const [status, setStatus] = useState('all');
+  const [sortBy, setSortBy] = useState('id'); // id | id-desc | name | name-desc | due | balance
 
   const classes = useMemo(() => uniqueClasses(families), [families]);
 
@@ -43,6 +44,13 @@ const FeeSheet = () => {
     const needle = query.trim().toLowerCase();
     return [String(family.id), family.name, ...family.students.map((s) => s.name)]
       .join(' ').toLowerCase().includes(needle);
+  }).sort((a, b) => {
+    if (sortBy === 'name') return a.family.name.localeCompare(b.family.name);
+    if (sortBy === 'name-desc') return b.family.name.localeCompare(a.family.name);
+    if (sortBy === 'due') return b.row.due - a.row.due;
+    if (sortBy === 'balance') return b.row.balance - a.row.balance;
+    if (sortBy === 'id-desc') return b.family.id - a.family.id;
+    return a.family.id - b.family.id;
   });
 
   const monthIndex = months.indexOf(month);
@@ -156,6 +164,15 @@ const FeeSheet = () => {
           <option value="unpaid">Unpaid only</option>
           <option value="partial">Partial only</option>
           <option value="paid">Paid only</option>
+        </select>
+
+        <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} aria-label="Sort">
+          <option value="id">Sort: ID first → last</option>
+          <option value="id-desc">Sort: ID last → first</option>
+          <option value="name">Sort: Name A → Z</option>
+          <option value="name-desc">Sort: Name Z → A</option>
+          <option value="due">Sort: Highest total due</option>
+          <option value="balance">Sort: Highest remaining</option>
         </select>
         <span className="adm-toolbar__count">{visible.length} shown</span>
       </div>
