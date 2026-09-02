@@ -12,8 +12,8 @@ export const school = {
   address: '437 Karim Block, Allama Iqbal Town, Lahore',
   phone: '+92 300 4296150',
   phoneHref: 'tel:+923004296150',
-  email: 'msameedch437@gmail.com',
-  emailHref: 'mailto:msameedch437@gmail.com',
+  email: 'azharfs@hotmail.com',
+  emailHref: 'mailto:azharfs@hotmail.com',
   whatsappHref:
     'https://wa.me/923004296150?text=' +
     encodeURIComponent('Assalam o Alaikum, I would like to ask about admission at Azhar Foundation School.'),
