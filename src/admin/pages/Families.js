@@ -75,8 +75,10 @@ const Families = () => {
     })
     .sort((a, b) => {
       if (sortBy === 'name') return a.family.name.localeCompare(b.family.name);
+      if (sortBy === 'name-desc') return b.family.name.localeCompare(a.family.name);
       if (sortBy === 'fee') return b.family.monthlyFee - a.family.monthlyFee;
       if (sortBy === 'balance') return b.ledger.closingBalance - a.ledger.closingBalance;
+      if (sortBy === 'id-desc') return b.family.id - a.family.id;
       return a.family.id - b.family.id;
     });
 
@@ -198,8 +200,10 @@ const Families = () => {
         </select>
 
         <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} aria-label="Sort">
-          <option value="id">Sort: ID</option>
-          <option value="name">Sort: Name A–Z</option>
+          <option value="id">Sort: ID 1 → {families.length ? Math.max(...families.map((f) => f.id)) : 'last'}</option>
+          <option value="id-desc">Sort: ID last → 1</option>
+          <option value="name">Sort: Name A → Z</option>
+          <option value="name-desc">Sort: Name Z → A</option>
           <option value="fee">Sort: Highest fee</option>
           <option value="balance">Sort: Highest balance</option>
         </select>

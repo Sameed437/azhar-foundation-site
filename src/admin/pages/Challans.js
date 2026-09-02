@@ -80,10 +80,30 @@ const ChallanCopy = ({ copy, family, row, month, settings }) => (
             <td>{rs(row.record.fine)}</td>
           </tr>
         )}
-        <tr className="challan__total">
-          <td>Total payable</td>
-          <td>{rs(Math.max(0, row.due))}</td>
-        </tr>
+        {Number(row.record?.received) > 0 ? (
+          <>
+            <tr>
+              <td>Total for the month</td>
+              <td>{rs(Math.max(0, row.due))}</td>
+            </tr>
+            <tr className="challan__paid">
+              <td>
+                Already paid
+                {row.record?.receivedDate ? ` (${row.record.receivedDate})` : ''}
+              </td>
+              <td>− {rs(row.record.received)}</td>
+            </tr>
+            <tr className="challan__total">
+              <td>Remaining payable</td>
+              <td>{rs(Math.max(0, row.balance))}</td>
+            </tr>
+          </>
+        ) : (
+          <tr className="challan__total">
+            <td>Total payable</td>
+            <td>{rs(Math.max(0, row.due))}</td>
+          </tr>
+        )}
       </tbody>
     </table>
 

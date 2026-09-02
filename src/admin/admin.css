@@ -988,6 +988,11 @@
   color: #1a237e;
 }
 
+.challan__paid td {
+  color: #137333;
+  font-weight: 600;
+}
+
 .challan__notes {
   list-style: decimal;
   padding-left: 16px;
@@ -1044,7 +1049,11 @@
 
   .adm-side {
     min-width: 0;
-    position: static;
+    /* stays pinned while the register scrolls - no trek back to the top */
+    position: sticky;
+    top: 0;
+    z-index: 60;
+    box-shadow: 0 4px 18px rgba(16, 22, 80, 0.25);
     height: auto;
     flex-direction: row;
     align-items: center;
