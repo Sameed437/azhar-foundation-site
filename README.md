@@ -8,7 +8,7 @@
 
 Marketing and information site for Azhar Foundation School, Allama Iqbal Town.
 
-[**Live site**](https://azhar-foundation-site.vercel.app/) · [Report an issue](https://github.com/Sameed437/azhar-foundation-site/issues)
+[**Live site**](https://azhar-foundation-school.vercel.app/) · [Report an issue](https://github.com/Sameed437/azhar-foundation-site/issues)
 
 ![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)
 ![React Router](https://img.shields.io/badge/React_Router-7-ca4245?logo=reactrouter&logoColor=white)
