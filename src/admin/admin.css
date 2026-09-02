@@ -1039,9 +1039,11 @@
 /* ---------------- responsive ---------------- */
 
 @media (max-width: 900px) {
-  .adm { grid-template-columns: 1fr; }
+  /* minmax(0,1fr): the nav chips' min-content must not stretch the track */
+  .adm { grid-template-columns: minmax(0, 1fr); }
 
   .adm-side {
+    min-width: 0;
     position: static;
     height: auto;
     flex-direction: row;
@@ -1061,6 +1063,7 @@
   .adm-side__nav {
     order: 3;
     width: 100%;
+    min-width: 0;
     flex-direction: row;
     overflow-x: auto;
     gap: 0.3rem;
@@ -1082,3 +1085,65 @@
 
 .adm-mini--undo { color: var(--danger-600); }
 .adm-mini--undo:hover { background: var(--danger-50); }
+
+/* ---------------- phones ---------------- */
+
+/* Nothing inside the main column may ever force it wider than the screen */
+.adm-page,
+.adm-panel,
+.adm-grid-2 > *,
+.adm-statrow > * { min-width: 0; }
+
+@media (max-width: 900px) {
+  .adm-side__brand strong { font-size: var(--fs-xs); }
+
+  .adm-side__nav {
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    /* right-edge fade hints that the row scrolls */
+    -webkit-mask-image: linear-gradient(to right, #000 92%, transparent);
+    mask-image: linear-gradient(to right, #000 92%, transparent);
+    padding-right: var(--space-4);
+  }
+
+  .adm-side__nav::-webkit-scrollbar { display: none; }
+
+  /* email can be long - the sign-out action matters more */
+  .adm-side__user > span { max-width: 130px; }
+}
+
+@media (max-width: 600px) {
+  .adm-main { padding: var(--space-4) var(--space-3) var(--space-8); }
+
+  .adm-page__head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .adm-page__head select { width: 100%; }
+
+  .adm-statrow {
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
+  }
+
+  .adm-stat { padding: var(--space-3) var(--space-4); }
+  .adm-stat strong { font-size: 1.15rem; }
+
+  .adm-panel { padding: var(--space-4); }
+
+  .adm-toolbar select { width: 100%; }
+  .adm-search { min-width: 0; width: 100%; }
+  .adm-toolbar__count { margin-left: 0; }
+
+  .adm-monthpick { width: 100%; }
+  .adm-monthpick select { flex: 1; }
+
+  .adm-table th,
+  .adm-table td { padding: 0.5rem 0.55rem; }
+
+  .adm-modal { padding: var(--space-2); align-items: flex-end; }
+  .adm-modal__card { padding: var(--space-4); max-height: 94vh; }
+
+  .adm-page__actions .btn { flex: 1; }
+}

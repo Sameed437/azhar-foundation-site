@@ -127,22 +127,26 @@ const CollectionChart = ({ series }) => {
         )}
       </div>
 
-      <table className="sr-only">
-        <caption>Fee collection by month</caption>
-        <thead>
-          <tr><th>Month</th><th>Charged</th><th>Collected</th><th>Outstanding</th></tr>
-        </thead>
-        <tbody>
-          {series.map((s) => (
-            <tr key={s.month}>
-              <td>{monthLabel(s.month)}</td>
-              <td>{rs(s.charged)}</td>
-              <td>{rs(s.received)}</td>
-              <td>{rs(Math.max(0, s.charged - s.received))}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      {/* sr-only must wrap the table, not BE the table — width on a <table>
+          acts as a minimum, so a "hidden" table would still stretch the page */}
+      <div className="sr-only">
+        <table>
+          <caption>Fee collection by month</caption>
+          <thead>
+            <tr><th>Month</th><th>Charged</th><th>Collected</th><th>Outstanding</th></tr>
+          </thead>
+          <tbody>
+            {series.map((s) => (
+              <tr key={s.month}>
+                <td>{monthLabel(s.month)}</td>
+                <td>{rs(s.charged)}</td>
+                <td>{rs(s.received)}</td>
+                <td>{rs(Math.max(0, s.charged - s.received))}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };
