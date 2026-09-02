@@ -249,6 +249,17 @@ const FeeSheet = () => {
                         Full
                       </button>
                     )}
+                    {Number(record.received) > 0 && (
+                      <button
+                        type="button"
+                        className="adm-mini adm-mini--undo"
+                        onClick={() => patchRecord(family.id, { received: 0, receivedDate: '' })}
+                        title="Undo this payment (clears received amount and date)"
+                      >
+                        <Icon name="close" size={13} strokeWidth={2.4} />
+                        Undo
+                      </button>
+                    )}
                     <Link
                       className="adm-mini"
                       to={`/admin/challans?month=${month}&family=${family.id}`}

@@ -1079,3 +1079,6 @@
 
   .adm-main { padding: var(--space-4); }
 }
+
+.adm-mini--undo { color: var(--danger-600); }
+.adm-mini--undo:hover { background: var(--danger-50); }
