@@ -387,12 +387,17 @@
 
 /* ---------------- tables ---------------- */
 
+/* The register scrolls inside its own frame so the header row stays
+   pinned (sticky th only works against the nearest scroll container). */
 .adm-tablewrap {
   background: var(--white);
   border: 1px solid var(--border-soft);
   border-radius: var(--r-lg);
   box-shadow: var(--shadow-sm);
-  overflow-x: auto;
+  overflow: auto;
+  max-height: calc(100vh - 170px);
+  max-height: calc(100dvh - 170px);
+  overscroll-behavior: contain;
 }
 
 .adm-table {
@@ -1150,6 +1155,11 @@
 
   .adm-table th,
   .adm-table td { padding: 0.5rem 0.55rem; }
+
+  .adm-tablewrap {
+    max-height: calc(100vh - 150px);
+    max-height: calc(100dvh - 150px);
+  }
 
   .adm-modal { padding: var(--space-2); align-items: flex-end; }
   .adm-modal__card { padding: var(--space-4); max-height: 94vh; }
