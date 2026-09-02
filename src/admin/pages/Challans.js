@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import Icon from '../../components/Icon';
 import { useAdmin } from '../AdminContext';
 import { monthLabel, monthShort, monthSummary, rs } from '../data/calc';
+import { familyHasClass, uniqueClasses } from '../data/classes';
 
 /** "5-Sep-2026" — the date style used on the existing Word challan. */
 const challanDate = (month, day) => {
@@ -108,6 +109,9 @@ const Challans = () => {
   );
   const [scope, setScope] = useState(() => (params.get('family') ? 'one' : 'due'));
   const [familyId, setFamilyId] = useState(() => Number(params.get('family')) || families[0]?.id || 0);
+  const [klass, setKlass] = useState('');
+
+  const classes = useMemo(() => uniqueClasses(families), [families]);
 
   const summary = useMemo(
     () => monthSummary(families, records, months, month),
@@ -117,6 +121,7 @@ const Challans = () => {
   const selected = summary.perFamily.filter(({ family, row }) => {
     if (!row || row.inactive) return false;
     if (scope === 'one') return family.id === Number(familyId);
+    if (!familyHasClass(family, klass)) return false;
     if (scope === 'due') return row.balance > 0;
     return true; // all
   });
@@ -152,6 +157,13 @@ const Challans = () => {
           <option value="all">All active families</option>
           <option value="one">One family</option>
         </select>
+
+        {scope !== 'one' && (
+          <select value={klass} onChange={(e) => setKlass(e.target.value)} aria-label="Filter by class">
+            <option value="">All classes</option>
+            {classes.map((c) => <option key={c} value={c}>Class {c}</option>)}
+          </select>
+        )}
 
         {scope === 'one' && (
           <select

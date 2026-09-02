@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import Icon from '../../components/Icon';
 import { useAdmin } from '../AdminContext';
 import { monthLabel, monthSummary, rs } from '../data/calc';
+import { familyHasClass, uniqueClasses } from '../data/classes';
 
 const STATUS_LABEL = {
   paid: 'Paid',
@@ -23,7 +24,10 @@ const FeeSheet = () => {
   const { families, records } = data;
   const [month, setMonth] = useState(currentMonth);
   const [query, setQuery] = useState('');
-  const [onlyDue, setOnlyDue] = useState(false);
+  const [klass, setKlass] = useState('');
+  const [status, setStatus] = useState('all');
+
+  const classes = useMemo(() => uniqueClasses(families), [families]);
 
   const summary = useMemo(
     () => monthSummary(families, records, months, month),
@@ -32,7 +36,9 @@ const FeeSheet = () => {
 
   const visible = summary.perFamily.filter(({ family, row }) => {
     if (row?.inactive) return false;
-    if (onlyDue && row.balance <= 0) return false;
+    if (!familyHasClass(family, klass)) return false;
+    if (status === 'due' && row.balance <= 0) return false;
+    if (['paid', 'partial', 'unpaid'].includes(status) && row.status !== status) return false;
     if (!query.trim()) return true;
     const needle = query.trim().toLowerCase();
     return [String(family.id), family.name, ...family.students.map((s) => s.name)]
@@ -139,14 +145,18 @@ const FeeSheet = () => {
             aria-label="Search families"
           />
         </div>
-        <label className="adm-check">
-          <input
-            type="checkbox"
-            checked={onlyDue}
-            onChange={(e) => setOnlyDue(e.target.checked)}
-          />
-          Only unpaid / partial
-        </label>
+        <select value={klass} onChange={(e) => setKlass(e.target.value)} aria-label="Filter by class">
+          <option value="">All classes</option>
+          {classes.map((c) => <option key={c} value={c}>Class {c}</option>)}
+        </select>
+
+        <select value={status} onChange={(e) => setStatus(e.target.value)} aria-label="Filter by status">
+          <option value="all">All statuses</option>
+          <option value="due">Unpaid + partial</option>
+          <option value="unpaid">Unpaid only</option>
+          <option value="partial">Partial only</option>
+          <option value="paid">Paid only</option>
+        </select>
         <span className="adm-toolbar__count">{visible.length} shown</span>
       </div>
 

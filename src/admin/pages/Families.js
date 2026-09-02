@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import Icon from '../../components/Icon';
 import { useAdmin } from '../AdminContext';
 import { familyLedger, rs } from '../data/calc';
+import { familyHasClass, uniqueClasses } from '../data/classes';
 
 const emptyFamily = (nextId) => ({
   id: nextId,
@@ -35,6 +36,9 @@ const Families = () => {
   const { families, records } = data;
 
   const [query, setQuery] = useState('');
+  const [klass, setKlass] = useState('');
+  const [balanceFilter, setBalanceFilter] = useState('all'); // all | due | clear
+  const [sortBy, setSortBy] = useState('id'); // id | name | fee | balance
   const [editing, setEditing] = useState(null); // a draft family object
   const [importOpen, setImportOpen] = useState(false);
   const [importText, setImportText] = useState('');
@@ -51,18 +55,30 @@ const Families = () => {
     [families, records, months]
   );
 
-  const visible = enriched.filter(({ family }) => {
-    if (!query.trim()) return true;
-    const needle = query.trim().toLowerCase();
-    const haystack = [
-      String(family.id),
-      family.name,
-      family.guardian,
-      family.phone,
-      ...family.students.map((s) => `${s.name} ${s.klass}`),
-    ].join(' ').toLowerCase();
-    return haystack.includes(needle);
-  });
+  const classes = useMemo(() => uniqueClasses(families), [families]);
+
+  const visible = enriched
+    .filter(({ family, ledger }) => {
+      if (!familyHasClass(family, klass)) return false;
+      if (balanceFilter === 'due' && ledger.closingBalance <= 0) return false;
+      if (balanceFilter === 'clear' && ledger.closingBalance > 0) return false;
+      if (!query.trim()) return true;
+      const needle = query.trim().toLowerCase();
+      const haystack = [
+        String(family.id),
+        family.name,
+        family.guardian,
+        family.phone,
+        ...family.students.map((s) => `${s.name} ${s.klass}`),
+      ].join(' ').toLowerCase();
+      return haystack.includes(needle);
+    })
+    .sort((a, b) => {
+      if (sortBy === 'name') return a.family.name.localeCompare(b.family.name);
+      if (sortBy === 'fee') return b.family.monthlyFee - a.family.monthlyFee;
+      if (sortBy === 'balance') return b.ledger.closingBalance - a.ledger.closingBalance;
+      return a.family.id - b.family.id;
+    });
 
   const totalStudents = families.reduce((sum, f) => sum + f.students.length, 0);
 
@@ -165,6 +181,29 @@ const Families = () => {
             aria-label="Search families"
           />
         </div>
+
+        <select value={klass} onChange={(e) => setKlass(e.target.value)} aria-label="Filter by class">
+          <option value="">All classes</option>
+          {classes.map((c) => <option key={c} value={c}>Class {c}</option>)}
+        </select>
+
+        <select
+          value={balanceFilter}
+          onChange={(e) => setBalanceFilter(e.target.value)}
+          aria-label="Filter by balance"
+        >
+          <option value="all">Any balance</option>
+          <option value="due">With balance due</option>
+          <option value="clear">Clear</option>
+        </select>
+
+        <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} aria-label="Sort">
+          <option value="id">Sort: ID</option>
+          <option value="name">Sort: Name A–Z</option>
+          <option value="fee">Sort: Highest fee</option>
+          <option value="balance">Sort: Highest balance</option>
+        </select>
+
         <span className="adm-toolbar__count">{visible.length} shown</span>
       </div>
 
