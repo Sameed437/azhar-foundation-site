@@ -6,6 +6,7 @@ import AdminLogin from './pages/AdminLogin';
 import Dashboard from './pages/Dashboard';
 import Families from './pages/Families';
 import FeeSheet from './pages/FeeSheet';
+import YearRegister from './pages/YearRegister';
 import Challans from './pages/Challans';
 import AdminSettings from './pages/AdminSettings';
 import { sessionLabel } from './data/calc';
@@ -15,6 +16,7 @@ const NAV = [
   { to: '/admin', label: 'Dashboard', icon: 'chart', end: true },
   { to: '/admin/families', label: 'Students & Families', icon: 'users' },
   { to: '/admin/fees', label: 'Fee Sheet', icon: 'grid' },
+  { to: '/admin/register', label: 'Yearly Register', icon: 'book' },
   { to: '/admin/challans', label: 'Challans', icon: 'receipt' },
   { to: '/admin/settings', label: 'Settings', icon: 'settings' },
 ];
@@ -147,6 +149,7 @@ const Shell = () => {
           <Route index element={<Dashboard />} />
           <Route path="families" element={<Families />} />
           <Route path="fees" element={<FeeSheet />} />
+          <Route path="register" element={<YearRegister />} />
           <Route path="challans" element={<Challans />} />
           <Route path="settings" element={<AdminSettings />} />
           <Route path="*" element={<Navigate to="/admin" replace />} />

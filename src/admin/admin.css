@@ -642,6 +642,68 @@
 .adm-cell::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 .adm-cell[type='number'] { -moz-appearance: textfield; }
 
+/* ---------------- yearly register (12 month columns) ---------------- */
+
+.adm-page--wide { max-width: none; }
+
+.adm-table--year { font-size: var(--fs-xs); }
+
+.adm-table--year th,
+.adm-table--year td { padding: 0.45rem 0.15rem; }
+
+.adm-table--year .adm-cell {
+  width: 54px;
+  padding: 0.25rem 0.15rem;
+  font-size: var(--fs-xs);
+}
+
+/* ID + Family stay pinned while the months scroll under them */
+.adm-year__id,
+.adm-year__name {
+  position: sticky;
+  background: var(--white);
+  z-index: 2;
+}
+
+.adm-year__id { left: 0; min-width: 38px; padding-left: 0.6rem !important; }
+.adm-year__name { left: 44px; min-width: 140px; max-width: 170px; overflow-wrap: break-word; }
+
+.adm-table--year thead .adm-year__id,
+.adm-table--year thead .adm-year__name {
+  z-index: 4;
+  background: var(--navy-50);
+}
+
+.adm-table--year tbody tr:hover .adm-year__id,
+.adm-table--year tbody tr:hover .adm-year__name { background: var(--ink-50); }
+
+/* month-cell colour = that month's status (only once the month arrives) */
+.adm-table--year td.is-cell-paid { background: #eaf6ee; }
+.adm-table--year td.is-cell-partial { background: #fff5e0; }
+.adm-table--year td.is-cell-unpaid { background: #fdefee; }
+.adm-table--year td.is-cell-clear { background: transparent; }
+
+.adm-year__off { color: var(--text-muted); text-align: center; }
+
+.adm-year__total { font-weight: 700; color: var(--navy-600); white-space: nowrap; }
+
+/* monthly totals pinned to the bottom of the scroll area */
+.adm-table--year tfoot td {
+  position: sticky;
+  bottom: 0;
+  background: var(--navy-50);
+  border-top: 1px solid var(--navy-100);
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--navy-600);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  z-index: 2;
+}
+
+.adm-table--year tfoot .adm-year__id,
+.adm-table--year tfoot .adm-year__name { background: var(--navy-50); z-index: 4; }
+
 /* ---------------- forms & modal ---------------- */
 
 .adm-form-grid {
