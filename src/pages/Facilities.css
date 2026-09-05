@@ -90,7 +90,10 @@
 
 .campus-strip__figure figcaption {
   position: absolute;
-  inset: auto 0 0 0;
+  top: auto;
+  right: 0;
+  bottom: 0;
+  left: 0;
   z-index: 1; /* above the .media-graded grading overlay */
   padding: var(--space-5) var(--space-4) var(--space-4);
   background: linear-gradient(to top, rgba(6, 9, 38, 0.88), transparent);

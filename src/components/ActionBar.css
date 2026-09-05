@@ -1,6 +1,9 @@
 .action-bar {
   position: fixed;
-  inset: auto 0 0 0;
+  top: auto;
+  right: 0;
+  bottom: 0;
+  left: 0;
   z-index: calc(var(--z-drawer) - 2);
   display: none;
   flex-direction: column;

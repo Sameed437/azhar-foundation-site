@@ -280,7 +280,10 @@ a.topbar__item:hover { color: #fff; }
 
 .nav-scrim {
   position: fixed;
-  inset: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   z-index: calc(var(--z-drawer) - 1);
   background: rgba(10, 14, 53, 0.5);
   backdrop-filter: blur(3px);
@@ -472,7 +475,10 @@ a.topbar__item:hover { color: #fff; }
 .dropdown::before {
   content: "";
   position: absolute;
-  inset: -12px 0 100% 0;
+  top: -12px;
+  right: 0;
+  bottom: 100%;
+  left: 0;
 }
 
 .dropdown__link {

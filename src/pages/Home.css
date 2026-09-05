@@ -13,7 +13,10 @@
 
 .hero__media {
   position: absolute;
-  inset: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   z-index: -4;
   overflow: hidden;
 }
@@ -36,7 +39,10 @@
 
 .hero__tint {
   position: absolute;
-  inset: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   z-index: -3;
   background: var(--blue-700);
   mix-blend-mode: color;
@@ -44,7 +50,10 @@
 
 .hero__scrim {
   position: absolute;
-  inset: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   z-index: -2;
   background: linear-gradient(
     115deg,
@@ -110,7 +119,10 @@
 /* Faint blueprint grid — institutional texture over the photo */
 .hero__grid {
   position: absolute;
-  inset: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   z-index: -1;
   background-image:
     linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
@@ -163,7 +175,10 @@
 .hero__pulse::after {
   content: "";
   position: absolute;
-  inset: -4px;
+  top: -4px;
+  right: -4px;
+  bottom: -4px;
+  left: -4px;
   border-radius: 50%;
   border: 1.5px solid var(--gold-400);
   animation: hero-pulse 2.4s var(--ease-out) infinite;
@@ -533,7 +548,10 @@
 .message__portrait::before {
   content: "";
   position: absolute;
-  inset: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   z-index: 1;
   pointer-events: none;
   background: linear-gradient(to right, transparent 62%, rgba(19, 92, 189, 0.45));
