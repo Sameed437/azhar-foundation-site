@@ -621,6 +621,27 @@
 .adm-table--sheet tr.is-partial td:first-child { box-shadow: inset 3px 0 0 #d97d00; }
 .adm-table--sheet tr.is-unpaid td:first-child { box-shadow: inset 3px 0 0 var(--danger-500); }
 
+/* The monthly register must show all its columns at once on a laptop —
+   tighter cells and narrower inputs instead of a sideways scrollbar.
+   (Screens narrower than the table still scroll; nothing is hidden.) */
+.adm-table--sheet { font-size: var(--fs-xs); }
+.adm-table--sheet th,
+.adm-table--sheet td { padding: 0.5rem 0.35rem; }
+.adm-table--sheet th:first-child,
+.adm-table--sheet td:first-child { padding-left: 0.65rem; }
+.adm-table--sheet .adm-students--tight { max-width: 160px; }
+.adm-table--sheet .adm-cell { width: 64px; padding: 0.3rem 0.3rem; }
+.adm-table--sheet .adm-cell--date { width: 106px; padding: 0.3rem 0.15rem; }
+.adm-table--sheet .adm-status { padding: 0.2rem 0.4rem; }
+.adm-table--sheet .adm-table__actions .adm-mini { padding: 0 0.35rem; }
+.adm-table--sheet .adm-table__actions button,
+.adm-table--sheet .adm-table__actions a { margin-left: 0.25rem; }
+
+/* the number inputs are tight — spinner arrows would eat half the box */
+.adm-cell::-webkit-outer-spin-button,
+.adm-cell::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.adm-cell[type='number'] { -moz-appearance: textfield; }
+
 /* ---------------- forms & modal ---------------- */
 
 .adm-form-grid {

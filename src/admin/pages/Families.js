@@ -160,8 +160,8 @@ const Families = () => {
           <h1>Students &amp; Families</h1>
           <p>
             {families.length} family accounts · {totalStudents} students. Siblings share one
-            account and one challan. <strong>Due till {monthShort(currentMonth)}</strong> is
-            everything owed up to this month (old months included, future months not) minus
+            account and one challan. <strong>Remaining</strong> is everything owed up to{' '}
+            {monthShort(currentMonth)} (old months included, future months not) minus
             everything paid.
           </p>
         </div>
@@ -210,7 +210,7 @@ const Families = () => {
           <option value="name">Sort: Name A → Z</option>
           <option value="name-desc">Sort: Name Z → A</option>
           <option value="fee">Sort: Highest fee</option>
-          <option value="balance">Sort: Highest balance due</option>
+          <option value="balance">Sort: Highest remaining</option>
         </select>
 
         <span className="adm-toolbar__count">{visible.length} shown</span>
@@ -229,7 +229,7 @@ const Families = () => {
                 className="is-num"
                 title="Old months + this month, minus everything paid. Future months are not counted."
               >
-                Due till {monthShort(currentMonth)}
+                Remaining
               </th>
               <th aria-label="Actions" />
             </tr>
