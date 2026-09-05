@@ -42,9 +42,13 @@ const ChallanCopy = ({ copy, family, row, month, settings }) => (
         <tr>
           <th>Student(s)</th>
           <td colSpan={3}>
-            {family.students.length
-              ? family.students.map((s) => `${s.name}${s.klass ? ` (${s.klass})` : ''}`).join(' + ')
-              : family.name}
+            {(() => {
+              const enrolled = family.students.filter((s) => !s.left);
+              const listed = enrolled.length ? enrolled : family.students;
+              return listed.length
+                ? listed.map((s) => `${s.name}${s.klass ? ` (${s.klass})` : ''}`).join(' + ')
+                : family.name;
+            })()}
           </td>
         </tr>
       </tbody>

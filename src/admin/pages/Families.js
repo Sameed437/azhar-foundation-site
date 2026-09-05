@@ -85,7 +85,12 @@ const Families = () => {
       return a.family.id - b.family.id;
     });
 
-  const totalStudents = families.reduce((sum, f) => sum + f.students.length, 0);
+  const totalStudents = families.reduce(
+    (sum, f) => sum + f.students.filter((s) => !s.left).length, 0
+  );
+  const leftStudents = families.reduce(
+    (sum, f) => sum + f.students.filter((s) => s.left).length, 0
+  );
 
   /* ---- editor helpers ---- */
   const startEdit = (family) =>
@@ -159,7 +164,8 @@ const Families = () => {
         <div>
           <h1>Students &amp; Families</h1>
           <p>
-            {families.length} family accounts · {totalStudents} students. Siblings share one
+            {families.length} family accounts · {totalStudents} students
+            {leftStudents > 0 && ` (${leftStudents} left the school)`}. Siblings share one
             account and one challan. <strong>Remaining</strong> is everything owed up to{' '}
             {monthShort(currentMonth)} (old months included, future months not) minus
             everything paid.
@@ -245,9 +251,10 @@ const Families = () => {
                   <td>
                     <div className="adm-students">
                       {family.students.map((s, i) => (
-                        <span key={i} className="adm-student">
+                        <span key={i} className={`adm-student${s.left ? ' is-left' : ''}`}>
                           {s.name}
                           {s.klass && <em>({s.klass})</em>}
+                          {s.left && <i className="adm-left-tag">left</i>}
                         </span>
                       ))}
                     </div>
@@ -327,7 +334,7 @@ const Families = () => {
             <fieldset className="adm-fieldset">
               <legend>Students in this family</legend>
               {editing.students.map((student, index) => (
-                <div key={index} className="adm-student-row">
+                <div key={index} className={`adm-student-row${student.left ? ' is-left' : ''}`}>
                   <input
                     type="text"
                     placeholder="Student name"
@@ -340,6 +347,17 @@ const Families = () => {
                     value={student.klass}
                     onChange={(e) => updateStudent(index, { klass: e.target.value })}
                   />
+                  <label
+                    className="adm-left-check"
+                    title="Tick when this student has left the school — they stay in the record, marked as left"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={!!student.left}
+                      onChange={(e) => updateStudent(index, { left: e.target.checked })}
+                    />
+                    Left
+                  </label>
                   <button
                     type="button"
                     aria-label="Remove student"
@@ -360,6 +378,14 @@ const Families = () => {
                 <Icon name="plus" size={14} />
                 Add sibling
               </button>
+              {editing.students.length > 0
+                && editing.students.every((s) => s.left)
+                && !editing.activeTo && (
+                <p className="adm-fieldset__hint">
+                  Every student here has left — also set <strong>Left (month)</strong> below,
+                  otherwise this family keeps getting billed each month.
+                </p>
+              )}
             </fieldset>
 
             <div className="adm-form-grid">

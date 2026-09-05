@@ -567,6 +567,25 @@
 
 .adm-student { line-height: 1.35; }
 
+/* a student marked as having left the school stays visible, struck through */
+.adm-student.is-left { color: var(--text-muted); text-decoration: line-through; }
+.adm-student.is-left em { color: var(--text-muted); }
+
+.adm-left-tag {
+  display: inline-block; /* escapes the parent's line-through */
+  font-style: normal;
+  font-family: var(--font-display);
+  font-size: var(--fs-micro);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--danger-600);
+  background: var(--danger-50);
+  border-radius: var(--r-pill);
+  padding: 0 0.4rem;
+  margin-left: 0.35rem;
+}
+
 .adm-student em {
   font-style: normal;
   color: var(--accent-text);
@@ -761,9 +780,38 @@
 
 .adm-student-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 110px 34px;
+  grid-template-columns: minmax(0, 1fr) 90px auto 34px;
   gap: 0.5rem;
   margin-bottom: 0.5rem;
+}
+
+.adm-student-row.is-left input[type='text'] {
+  color: var(--text-muted);
+  text-decoration: line-through;
+  background: var(--ink-50);
+}
+
+.adm-left-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  align-self: center;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--ink-600);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.adm-left-check input { width: 15px; height: 15px; accent-color: var(--danger-500); }
+
+.adm-fieldset__hint {
+  margin-top: 0.4rem;
+  font-size: var(--fs-xs);
+  color: var(--danger-600);
+  background: var(--danger-50);
+  border-radius: var(--r-sm);
+  padding: 0.5rem 0.7rem;
 }
 
 .adm-student-row input {

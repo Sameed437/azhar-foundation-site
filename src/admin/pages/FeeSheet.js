@@ -203,8 +203,9 @@ const FeeSheet = () => {
                   <td>
                     <div className="adm-students adm-students--tight">
                       {family.students.map((s, i) => (
-                        <span key={i} className="adm-student">
+                        <span key={i} className={`adm-student${s.left ? ' is-left' : ''}`}>
                           {s.name}{s.klass && <em>({s.klass})</em>}
+                          {s.left && <i className="adm-left-tag">left</i>}
                         </span>
                       ))}
                     </div>
