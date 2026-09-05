@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import Icon from '../../components/Icon';
 import { useAdmin } from '../AdminContext';
-import { familyLedger, rs } from '../data/calc';
+import { familyLedger, monthShort, rs } from '../data/calc';
 import { familyHasClass, uniqueClasses } from '../data/classes';
 
 const emptyFamily = (nextId) => ({
@@ -32,7 +32,7 @@ const parseStudentsCell = (cell) =>
     });
 
 const Families = () => {
-  const { data, months, saveFamily, deleteFamily } = useAdmin();
+  const { data, months, currentMonth, saveFamily, deleteFamily } = useAdmin();
   const { families, records } = data;
 
   const [query, setQuery] = useState('');
@@ -48,20 +48,23 @@ const Families = () => {
 
   const enriched = useMemo(
     () =>
-      families.map((family) => ({
-        family,
-        ledger: familyLedger(family, records[family.id] || {}, months),
-      })),
-    [families, records, months]
+      families.map((family) => {
+        const ledger = familyLedger(family, records[family.id] || {}, months);
+        // What the family owes up to the CURRENT month only — future months
+        // of the session are not counted.
+        const asOf = ledger.rows.find((row) => row.month === currentMonth);
+        return { family, ledger, balanceDue: asOf ? asOf.balance : ledger.closingBalance };
+      }),
+    [families, records, months, currentMonth]
   );
 
   const classes = useMemo(() => uniqueClasses(families), [families]);
 
   const visible = enriched
-    .filter(({ family, ledger }) => {
+    .filter(({ family, balanceDue }) => {
       if (!familyHasClass(family, klass)) return false;
-      if (balanceFilter === 'due' && ledger.closingBalance <= 0) return false;
-      if (balanceFilter === 'clear' && ledger.closingBalance > 0) return false;
+      if (balanceFilter === 'due' && balanceDue <= 0) return false;
+      if (balanceFilter === 'clear' && balanceDue > 0) return false;
       if (!query.trim()) return true;
       const needle = query.trim().toLowerCase();
       const haystack = [
@@ -77,7 +80,7 @@ const Families = () => {
       if (sortBy === 'name') return a.family.name.localeCompare(b.family.name);
       if (sortBy === 'name-desc') return b.family.name.localeCompare(a.family.name);
       if (sortBy === 'fee') return b.family.monthlyFee - a.family.monthlyFee;
-      if (sortBy === 'balance') return b.ledger.closingBalance - a.ledger.closingBalance;
+      if (sortBy === 'balance') return b.balanceDue - a.balanceDue;
       if (sortBy === 'id-desc') return b.family.id - a.family.id;
       return a.family.id - b.family.id;
     });
@@ -157,7 +160,9 @@ const Families = () => {
           <h1>Students &amp; Families</h1>
           <p>
             {families.length} family accounts · {totalStudents} students. Siblings share one
-            account and one challan, exactly like the fee register.
+            account and one challan. <strong>Due till {monthShort(currentMonth)}</strong> is
+            everything owed up to this month (old months included, future months not) minus
+            everything paid.
           </p>
         </div>
         <div className="adm-page__actions">
@@ -205,7 +210,7 @@ const Families = () => {
           <option value="name">Sort: Name A → Z</option>
           <option value="name-desc">Sort: Name Z → A</option>
           <option value="fee">Sort: Highest fee</option>
-          <option value="balance">Sort: Highest balance</option>
+          <option value="balance">Sort: Highest balance due</option>
         </select>
 
         <span className="adm-toolbar__count">{visible.length} shown</span>
@@ -220,12 +225,17 @@ const Families = () => {
               <th>Guardian / phone</th>
               <th className="is-num">Monthly fee</th>
               <th className="is-num">Concession</th>
-              <th className="is-num">Balance</th>
+              <th
+                className="is-num"
+                title="Old months + this month, minus everything paid. Future months are not counted."
+              >
+                Due till {monthShort(currentMonth)}
+              </th>
               <th aria-label="Actions" />
             </tr>
           </thead>
           <tbody>
-            {visible.map(({ family, ledger }) => {
+            {visible.map(({ family, balanceDue }) => {
               const concession = family.listFee !== '' && family.listFee != null
                 ? Math.max(0, Number(family.listFee) - Number(family.monthlyFee))
                 : 0;
@@ -251,8 +261,8 @@ const Families = () => {
                   </td>
                   <td className="is-num">{rs(family.monthlyFee)}</td>
                   <td className="is-num">{concession ? rs(concession) : '—'}</td>
-                  <td className={`is-num ${ledger.closingBalance > 0 ? 'is-due' : 'is-clear'}`}>
-                    {rs(ledger.closingBalance)}
+                  <td className={`is-num ${balanceDue > 0 ? 'is-due' : 'is-clear'}`}>
+                    {balanceDue > 0 ? rs(balanceDue) : 'Clear'}
                   </td>
                   <td className="adm-table__actions">
                     <button type="button" onClick={() => startEdit(family)} aria-label={`Edit ${family.name}`}>

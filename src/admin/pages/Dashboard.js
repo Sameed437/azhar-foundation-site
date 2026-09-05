@@ -297,7 +297,7 @@ const Dashboard = () => {
             unpaid={summary.unpaidCount}
           />
 
-          <h2 className="adm-panel__subhead">Largest balances</h2>
+          <h2 className="adm-panel__subhead">Highest amounts due</h2>
           {defaulters.length ? (
             <ul className="adm-defaulters">
               {defaulters.map(({ family, row }) => (
