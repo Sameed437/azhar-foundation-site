@@ -4,6 +4,7 @@ import React, {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 import { getDriver, normalizeSnapshot, storageMode } from './data/store';
@@ -24,6 +25,13 @@ export const AdminProvider = ({ children }) => {
   const [data, setData] = useState(() => normalizeSnapshot({}));
   const [loadError, setLoadError] = useState('');
   const [saveError, setSaveError] = useState('');
+  const [pendingSaves, setPendingSaves] = useState(0);
+  const [failedCount, setFailedCount] = useState(0);
+  const [lastSavedAt, setLastSavedAt] = useState(0);
+  /** Per-key promise chains: writes to the same family/record run in order. */
+  const chainsRef = useRef(new Map());
+  /** Writes that exhausted their retries, kept so "Retry" can resend them. */
+  const failedRef = useRef([]);
 
   const refresh = useCallback(async () => {
     try {
@@ -63,9 +71,59 @@ export const AdminProvider = ({ children }) => {
     setUser(null);
   }, [driver]);
 
-  const persist = useCallback((work) => {
-    work().catch((error) => setSaveError(error.message || 'Could not save.'));
+  /**
+   * Persist a write in the background: writes to the same key run in order,
+   * failures retry twice (network blips), and only then land in the retry
+   * queue with a visible error. A newer edit to the same key supersedes any
+   * queued failure for it — the screen always holds the latest value.
+   */
+  const persist = useCallback((key, work) => {
+    if (failedRef.current.some((f) => f.key === key)) {
+      failedRef.current = failedRef.current.filter((f) => f.key !== key);
+      setFailedCount(failedRef.current.length);
+    }
+    setPendingSaves((n) => n + 1);
+    const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+    const prev = chainsRef.current.get(key) || Promise.resolve();
+    const next = prev
+      .then(async () => {
+        for (let attempt = 0; ; attempt++) {
+          try {
+            await work();
+            setLastSavedAt(Date.now());
+            return;
+          } catch (error) {
+            if (attempt < 2) { await sleep(800 * (attempt + 1)); continue; }
+            failedRef.current.push({ key, work });
+            setFailedCount(failedRef.current.length);
+            setSaveError(error.message || 'Could not save.');
+            return;
+          }
+        }
+      })
+      .finally(() => setPendingSaves((n) => n - 1));
+    chainsRef.current.set(key, next);
   }, []);
+
+  /** Resend every write that previously failed (same data, same order). */
+  const retryFailed = useCallback(() => {
+    const queue = failedRef.current;
+    failedRef.current = [];
+    setFailedCount(0);
+    setSaveError('');
+    queue.forEach(({ key, work }) => persist(key, work));
+  }, [persist]);
+
+  /** Don't let the tab close while a save is in flight or failed. */
+  useEffect(() => {
+    if (pendingSaves === 0 && failedCount === 0) return undefined;
+    const warn = (event) => {
+      event.preventDefault();
+      event.returnValue = '';
+    };
+    window.addEventListener('beforeunload', warn);
+    return () => window.removeEventListener('beforeunload', warn);
+  }, [pendingSaves, failedCount]);
 
   const saveFamily = useCallback((family) => {
     setData((current) => {
@@ -74,7 +132,7 @@ export const AdminProvider = ({ children }) => {
         : [...current.families, family];
       return normalizeSnapshot({ ...current, families });
     });
-    persist(() => driver.saveFamily(family));
+    persist(`family-${family.id}`, () => driver.saveFamily(family));
   }, [driver, persist]);
 
   const deleteFamily = useCallback((familyId) => {
@@ -87,7 +145,7 @@ export const AdminProvider = ({ children }) => {
         records,
       });
     });
-    persist(() => driver.deleteFamily(familyId));
+    persist(`family-${familyId}`, () => driver.deleteFamily(familyId));
   }, [driver, persist]);
 
   const saveRecord = useCallback((familyId, month, record) => {
@@ -98,12 +156,12 @@ export const AdminProvider = ({ children }) => {
         [familyId]: { ...(current.records[familyId] || {}), [month]: record },
       },
     }));
-    persist(() => driver.saveRecord(familyId, month, record));
+    persist(`record-${familyId}-${month}`, () => driver.saveRecord(familyId, month, record));
   }, [driver, persist]);
 
   const saveSettings = useCallback((settings) => {
     setData((current) => normalizeSnapshot({ ...current, settings }));
-    persist(() => driver.saveSettings(settings));
+    persist('settings', () => driver.saveSettings(settings));
   }, [driver, persist]);
 
   const replaceAll = useCallback(async (snapshot) => {
@@ -133,6 +191,10 @@ export const AdminProvider = ({ children }) => {
     currentMonth,
     loadError,
     saveError,
+    pendingSaves,
+    failedCount,
+    lastSavedAt,
+    retryFailed,
     clearSaveError: () => setSaveError(''),
     signIn,
     signOut,

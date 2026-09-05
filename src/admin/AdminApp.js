@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { NavLink, Navigate, Route, Routes } from 'react-router-dom';
 import Icon from '../components/Icon';
 import { AdminProvider, useAdmin } from './AdminContext';
@@ -19,8 +19,52 @@ const NAV = [
   { to: '/admin/settings', label: 'Settings', icon: 'settings' },
 ];
 
+/**
+ * "Saving… / Saved / Not saved" pill. Quiet when idle; while a write is on
+ * its way to the database it says so, and a failed write stays on screen
+ * with a Retry button until it lands.
+ */
+const SaveState = () => {
+  const { pendingSaves, failedCount, lastSavedAt, retryFailed } = useAdmin();
+  const [justSaved, setJustSaved] = useState(false);
+
+  useEffect(() => {
+    if (!lastSavedAt || pendingSaves > 0) return undefined;
+    setJustSaved(true);
+    const timer = setTimeout(() => setJustSaved(false), 2400);
+    return () => clearTimeout(timer);
+  }, [lastSavedAt, pendingSaves]);
+
+  if (failedCount > 0) {
+    return (
+      <div className="adm-savestate is-error adm-noprint" role="status">
+        <span className="adm-savestate__dot" />
+        {failedCount === 1 ? '1 change not saved' : `${failedCount} changes not saved`}
+        <button type="button" onClick={retryFailed}>Retry</button>
+      </div>
+    );
+  }
+  if (pendingSaves > 0) {
+    return (
+      <div className="adm-savestate is-saving adm-noprint" role="status">
+        <span className="adm-savestate__dot" />
+        Saving…
+      </div>
+    );
+  }
+  if (justSaved) {
+    return (
+      <div className="adm-savestate is-saved adm-noprint" role="status">
+        <Icon name="check" size={14} strokeWidth={2.6} />
+        Saved
+      </div>
+    );
+  }
+  return null;
+};
+
 const Shell = () => {
-  const { user, booting, data, mode, signOut, saveError, clearSaveError } = useAdmin();
+  const { user, booting, data, mode, signOut, saveError, clearSaveError, failedCount, retryFailed } = useAdmin();
 
   if (booting) {
     return (
@@ -82,7 +126,16 @@ const Shell = () => {
       <main className="adm-main">
         {saveError && (
           <div className="adm-alert adm-alert--error" role="alert">
-            <span>Save failed: {saveError}</span>
+            <span>
+              Could not save the last change ({saveError}) — check the internet
+              connection, then press Retry. The change is still on screen and
+              will not be lost while this page stays open.
+            </span>
+            {failedCount > 0 && (
+              <button type="button" className="adm-alert__retry" onClick={retryFailed}>
+                Retry
+              </button>
+            )}
             <button type="button" onClick={clearSaveError}>
               <Icon name="close" size={16} />
               <span className="sr-only">Dismiss</span>
@@ -98,6 +151,7 @@ const Shell = () => {
           <Route path="settings" element={<AdminSettings />} />
           <Route path="*" element={<Navigate to="/admin" replace />} />
         </Routes>
+        <SaveState />
       </main>
     </div>
   );

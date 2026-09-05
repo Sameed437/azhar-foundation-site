@@ -166,6 +166,69 @@
 
 .adm-alert button { border: none; background: none; color: inherit; display: grid; }
 
+.adm-alert__retry {
+  flex-shrink: 0;
+  padding: 0.3rem 0.85rem !important;
+  border-radius: 999px;
+  background: var(--danger-600) !important;
+  color: #fff !important;
+  font-weight: 700;
+  font-size: var(--fs-xs);
+  cursor: pointer;
+}
+
+/* ---- Save indicator: Saving… / Saved / N changes not saved ---- */
+
+.adm-savestate {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 90;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  background: #fff;
+  color: #5f6368;
+  border: 1px solid rgba(26, 35, 126, 0.14);
+  box-shadow: 0 6px 22px rgba(16, 22, 80, 0.16);
+}
+
+.adm-savestate__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.adm-savestate.is-saving { color: #b05a00; }
+.adm-savestate.is-saving .adm-savestate__dot { animation: adm-savepulse 1s ease-in-out infinite; }
+.adm-savestate.is-saved { color: #137333; }
+.adm-savestate.is-error { color: #c5221f; border-color: rgba(197, 34, 31, 0.35); }
+
+.adm-savestate button {
+  border: none;
+  border-radius: 999px;
+  padding: 0.25rem 0.8rem;
+  background: #c5221f;
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+@keyframes adm-savepulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .adm-savestate.is-saving .adm-savestate__dot { animation: none; }
+}
+
 .adm-page { max-width: 1200px; }
 
 .adm-page__head {
