@@ -76,12 +76,10 @@ const YearRegister = () => {
 
   const patchReceived = (familyId, month, value) => {
     const existing = records[familyId]?.[month] || {};
-    saveRecord(familyId, month, {
-      fee: '', misc: 0, fine: 0, received: 0, receivedDate: '', note: '',
-      ...existing,
-      received: value || 0,
-      receivedDate: value ? (existing.receivedDate || todayIso()) : '',
-    });
+    const record = { fee: '', misc: 0, fine: 0, received: 0, receivedDate: '', note: '', ...existing };
+    record.received = value || 0;
+    record.receivedDate = value ? (existing.receivedDate || todayIso()) : '';
+    saveRecord(familyId, month, record);
   };
 
   const monthTotals = months.map((month) =>
