@@ -1,10 +1,14 @@
 import React, { useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import Icon from '../../components/Icon';
 import { useAdmin } from '../AdminContext';
 import { sessionLabel } from '../data/calc';
 
+/** ID far above the real register (1-83), so the practice entry is unmistakable. */
+const TEST_FAMILY_ID = 999;
+
 const AdminSettings = () => {
-  const { data, mode, saveSettings, replaceAll } = useAdmin();
+  const { data, mode, saveSettings, replaceAll, saveFamily } = useAdmin();
   const [draft, setDraft] = useState(data.settings);
   const [status, setStatus] = useState('');
   const fileRef = useRef(null);
@@ -160,6 +164,49 @@ const AdminSettings = () => {
             onChange={restoreBackup}
           />
         </div>
+      </section>
+
+      <section className="adm-panel">
+        <h2>Testing</h2>
+        <p className="adm-help">
+          Creates a practice family, <strong>#{TEST_FAMILY_ID} &ldquo;TEST FAMILY&rdquo;</strong>,
+          with two students, a Rs. 1,000 fee, a Rs. 500 concession and Rs. 500 opening arrears —
+          so you can safely try everything: record a payment, Undo, print its challan, tick a
+          student as left, adjust its fee. Put <em>your own</em> phone number on it to test
+          WhatsApp sending on yourself. It behaves like any family, so its amounts appear in
+          totals while it exists — delete it from{' '}
+          <Link to="/admin/families">Students &amp; Families</Link> (open it → Delete family)
+          when you&rsquo;re done, and every trace of it goes with it.
+        </p>
+        <button
+          type="button"
+          className="btn btn--primary"
+          disabled={data.families.some((f) => f.id === TEST_FAMILY_ID)}
+          onClick={() => {
+            saveFamily({
+              id: TEST_FAMILY_ID,
+              name: 'TEST FAMILY (practice entry)',
+              guardian: 'Test Guardian',
+              phone: '',
+              students: [
+                { name: 'Test Student One', klass: '5' },
+                { name: 'Test Student Two', klass: '2' },
+              ],
+              listFee: 1500,
+              monthlyFee: 1000,
+              openingArrears: 500,
+              notes: 'Practice entry — safe to edit and delete. Not a real family.',
+              activeFrom: '',
+              activeTo: '',
+            });
+            setStatus(`Test family #${TEST_FAMILY_ID} created — find it on Students & Families.`);
+          }}
+        >
+          <Icon name="sparkle" size={16} />
+          {data.families.some((f) => f.id === TEST_FAMILY_ID)
+            ? `Test family #${TEST_FAMILY_ID} already exists`
+            : `Create test family #${TEST_FAMILY_ID}`}
+        </button>
       </section>
 
       <section className="adm-panel">
