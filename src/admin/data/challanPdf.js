@@ -2,8 +2,12 @@ import { jsPDF } from 'jspdf';
 import { monthLabel, monthShort, rs } from './calc';
 import { challanDate } from './whatsapp';
 
-/* A4 in points. Two copies per page (student + office), like the print view. */
-const PAGE_W = 595.28;
+/* Legal paper (8.5in × 14in) in points. Each challan form is exactly
+   8.5in × 6.5in — two per sheet with the cut at the 6.5in mark, matching
+   the school's half-inserted legal paper workflow. */
+const PAGE_W = 612; // 8.5in
+const FORM_H = 468; // 6.5in per challan form
+const PAD_TOP = 30; // breathing room inside each form
 const MARGIN = 36;
 const NAVY = [26, 35, 126];
 const GREEN = [19, 115, 51];
@@ -169,20 +173,21 @@ const drawCutLine = (doc, y) => {
 };
 
 /**
- * Build one PDF with an A4 page per family: Student Copy on top,
- * Office Copy below — the same challan the print view produces.
+ * Build one PDF with a Legal page (8.5in × 14in) per family: the Student
+ * Copy fills the top 6.5in, the cut line sits exactly at 6.5in, and the
+ * Office Copy fills the next 6.5in — so one straight cut yields two
+ * 8.5in × 6.5in challan forms, the school's physical slip size.
  * items: [{ family, row }]
  */
 export const buildChallanPdf = async (items, month, settings) => {
   const logo = await loadLogo();
-  const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+  const doc = new jsPDF({ unit: 'pt', format: 'legal' });
 
   items.forEach(({ family, row }, index) => {
     if (index > 0) doc.addPage();
-    const afterFirst = drawCopy(doc, MARGIN, 'Student Copy', family, row, month, settings, logo);
-    const cutY = Math.max(afterFirst + 14, 400);
-    drawCutLine(doc, cutY);
-    drawCopy(doc, cutY + 22, 'Office Copy', family, row, month, settings, logo);
+    drawCopy(doc, PAD_TOP, 'Student Copy', family, row, month, settings, logo);
+    drawCutLine(doc, FORM_H);
+    drawCopy(doc, FORM_H + PAD_TOP, 'Office Copy', family, row, month, settings, logo);
   });
 
   return doc;

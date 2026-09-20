@@ -1383,8 +1383,12 @@
 /* ---------------- print ---------------- */
 
 @media print {
+  /* Legal paper: two 8.5in x 6.5in challan forms per sheet, cut at 6.5in.
+     Pick "Legal" as the paper size in the print dialog. */
+  @page { size: 8.5in 14in; margin: 0; }
+
   .adm { display: block; background: #fff; }
-  .adm-side, .adm-noprint, .adm-alert { display: none !important; }
+  .adm-side, .adm-noprint, .adm-alert, .adm-savestate { display: none !important; }
   .adm-main { padding: 0; }
   .adm-page { max-width: none; }
 
@@ -1395,11 +1399,29 @@
     box-shadow: none;
     border-radius: 0;
     max-width: none;
-    padding: 8mm 10mm;
+    padding: 0;
     page-break-after: always;
   }
 
   .challan-page:last-child { page-break-after: auto; }
+
+  /* each copy is exactly one 6.5in form */
+  .challan {
+    height: 6.5in;
+    box-sizing: border-box;
+    padding: 0.35in 0.5in;
+    overflow: hidden;
+  }
+
+  /* the cut line sits exactly on the 6.5in boundary */
+  .challan-cut {
+    height: 0;
+    margin: 0;
+    padding: 0;
+    line-height: 0;
+    border-top: 1px dashed #999;
+    font-size: 8px;
+  }
 }
 
 /* ---------------- responsive ---------------- */
