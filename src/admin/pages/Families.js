@@ -246,7 +246,15 @@ const Families = () => {
                 ? Math.max(0, Number(family.listFee) - Number(family.monthlyFee))
                 : 0;
               return (
-                <tr key={family.id}>
+                <tr
+                  key={family.id}
+                  className="adm-row--open"
+                  title="Click to open this family"
+                  onClick={(e) => {
+                    if (e.target.closest('a, button, input, select')) return;
+                    startEdit(family);
+                  }}
+                >
                   <td className="adm-table__id">{family.id}</td>
                   <td>
                     <div className="adm-students">

@@ -185,6 +185,8 @@
   right: 16px;
   bottom: 16px;
   z-index: 90;
+  /* status only - never steal clicks from buttons underneath it */
+  pointer-events: none;
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -208,7 +210,11 @@
 .adm-savestate.is-saving { color: #b05a00; }
 .adm-savestate.is-saving .adm-savestate__dot { animation: adm-savepulse 1s ease-in-out infinite; }
 .adm-savestate.is-saved { color: #137333; }
-.adm-savestate.is-error { color: #c5221f; border-color: rgba(197, 34, 31, 0.35); }
+.adm-savestate.is-error {
+  color: #c5221f;
+  border-color: rgba(197, 34, 31, 0.35);
+  pointer-events: auto; /* the Retry button must stay clickable */
+}
 
 .adm-savestate button {
   border: none;
@@ -497,6 +503,9 @@
 
 .adm-table tbody tr:last-child td { border-bottom: none; }
 .adm-table tbody tr:hover { background: var(--ink-50); }
+
+/* whole row opens the family editor */
+.adm-row--open { cursor: pointer; }
 
 .adm-table .is-num,
 .adm-table td.is-num {
