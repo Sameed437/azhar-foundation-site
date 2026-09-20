@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import Icon from '../../components/Icon';
 import { useAdmin } from '../AdminContext';
-import { familyLedger, monthLabel, rs } from '../data/calc';
+import { amt, familyLedger, monthLabel } from '../data/calc';
 import { familyHasClass, uniqueClasses } from '../data/classes';
 
 const todayIso = () => new Date().toISOString().slice(0, 10);
@@ -163,7 +163,7 @@ const YearRegister = () => {
                     </td>
                   );
                 })}
-                <td className="is-num adm-year__total">{rs(ledger.totalReceived)}</td>
+                <td className="is-num adm-year__total">{amt(ledger.totalReceived)}</td>
               </tr>
             ))}
             {!visible.length && (
@@ -184,7 +184,7 @@ const YearRegister = () => {
                     {total ? total.toLocaleString('en-PK') : '—'}
                   </td>
                 ))}
-                <td className="is-num">{rs(grandTotal)}</td>
+                <td className="is-num">{amt(grandTotal)}</td>
               </tr>
             </tfoot>
           )}

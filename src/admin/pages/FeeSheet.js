@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Icon from '../../components/Icon';
 import { useAdmin } from '../AdminContext';
-import { monthLabel, monthSummary, rs } from '../data/calc';
+import { amt, monthLabel, monthSummary, rs } from '../data/calc';
 import { familyHasClass, uniqueClasses } from '../data/classes';
 
 const STATUS_LABEL = {
@@ -220,8 +220,10 @@ const FeeSheet = () => {
                       ))}
                     </div>
                   </td>
-                  <td className={`is-num ${row.arrearsIn > 0 ? 'is-due' : ''}`}>
-                    {row.arrearsIn ? rs(row.arrearsIn) : '—'}
+                  <td className={`is-num ${row.arrearsIn > 0 ? 'is-due' : row.arrearsIn < 0 ? 'is-clear' : ''}`}>
+                    {row.arrearsIn > 0 && amt(row.arrearsIn)}
+                    {row.arrearsIn < 0 && `Adv ${amt(-row.arrearsIn)}`}
+                    {!row.arrearsIn && '—'}
                   </td>
                   <td className="is-num">
                     <NumberCell
@@ -239,7 +241,7 @@ const FeeSheet = () => {
                       onCommit={(v) => patchRecord(family.id, { misc: v || 0 })}
                     />
                   </td>
-                  <td className="is-num adm-table__due">{rs(row.due)}</td>
+                  <td className="is-num adm-table__due">{amt(row.due)}</td>
                   <td className="is-num">
                     <NumberCell
                       value={record.received || ''}
@@ -263,22 +265,26 @@ const FeeSheet = () => {
                     const remaining = Math.max(0, row.balance);
                     return (
                       <>
-                        <td className="is-num adm-split">{feeRecv ? rs(feeRecv) : '—'}</td>
-                        <td className="is-num adm-split">{arrRecv ? rs(arrRecv) : '—'}</td>
+                        <td className="is-num adm-split">{feeRecv ? amt(feeRecv) : '—'}</td>
+                        <td className="is-num adm-split">{arrRecv ? amt(arrRecv) : '—'}</td>
                         <td className={`is-num ${remaining > 0 ? 'is-due' : 'is-clear'}`}>
-                          {remaining > 0 ? rs(remaining) : 'Clear'}
+                          {remaining > 0 ? amt(remaining) : 'Clear'}
                         </td>
                       </>
                     );
                   })()}
                   <td>
-                    <input
-                      className="adm-cell adm-cell--date"
-                      type="date"
-                      value={record.receivedDate || ''}
-                      aria-label={`Payment date for ${family.name}`}
-                      onChange={(e) => patchRecord(family.id, { receivedDate: e.target.value })}
-                    />
+                    {Number(record.received) > 0 || record.receivedDate ? (
+                      <input
+                        className="adm-cell adm-cell--date"
+                        type="date"
+                        value={record.receivedDate || ''}
+                        aria-label={`Payment date for ${family.name}`}
+                        onChange={(e) => patchRecord(family.id, { receivedDate: e.target.value })}
+                      />
+                    ) : (
+                      <span className="adm-split">—</span>
+                    )}
                   </td>
                   <td>
                     <span className={`adm-status adm-status--${row.status}`}>

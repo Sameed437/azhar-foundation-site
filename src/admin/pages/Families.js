@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import Icon from '../../components/Icon';
 import { useAdmin } from '../AdminContext';
-import { familyLedger, monthShort, rs } from '../data/calc';
+import { amt, familyLedger, monthShort } from '../data/calc';
 import { familyHasClass, uniqueClasses } from '../data/classes';
 
 const emptyFamily = (nextId) => ({
@@ -274,10 +274,10 @@ const Families = () => {
                       {family.phone && <a href={`tel:${family.phone}`}>{family.phone}</a>}
                     </div>
                   </td>
-                  <td className="is-num">{rs(family.monthlyFee)}</td>
-                  <td className="is-num">{concession ? rs(concession) : '—'}</td>
+                  <td className="is-num">{amt(family.monthlyFee)}</td>
+                  <td className="is-num">{concession ? amt(concession) : '—'}</td>
                   <td className={`is-num ${balanceDue > 0 ? 'is-due' : 'is-clear'}`}>
-                    {balanceDue > 0 ? rs(balanceDue) : 'Clear'}
+                    {balanceDue > 0 ? amt(balanceDue) : 'Clear'}
                   </td>
                   <td className="adm-table__actions">
                     <button type="button" onClick={() => startEdit(family)} aria-label={`Edit ${family.name}`}>

@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Icon from '../../components/Icon';
 import { useAdmin } from '../AdminContext';
-import { monthLabel, monthSummary, rs } from '../data/calc';
+import { amt, monthLabel, monthSummary } from '../data/calc';
 import { familyHasClass, uniqueClasses } from '../data/classes';
 import { waChallanLink, waPhone } from '../data/whatsapp';
 import { buildChallanPdf, challanPdfName } from '../data/challanPdf';
@@ -331,10 +331,12 @@ const WhatsAppSend = () => {
                       onCommit={(v) => patchFee(family.id, v)}
                     />
                   </td>
-                  <td className={`is-num ${row.arrearsIn > 0 ? 'is-due' : ''}`}>
-                    {row.arrearsIn ? rs(row.arrearsIn) : '—'}
+                  <td className={`is-num ${row.arrearsIn > 0 ? 'is-due' : row.arrearsIn < 0 ? 'is-clear' : ''}`}>
+                    {row.arrearsIn > 0 && amt(row.arrearsIn)}
+                    {row.arrearsIn < 0 && `Adv ${amt(-row.arrearsIn)}`}
+                    {!row.arrearsIn && '—'}
                   </td>
-                  <td className="is-num adm-table__due">{rs(Math.max(0, row.due))}</td>
+                  <td className="is-num adm-table__due">{amt(Math.max(0, row.due))}</td>
                   <td className="adm-wa__send">
                     {link ? (
                       <a

@@ -50,6 +50,10 @@ export const monthShort = (key) => {
 export const rs = (amount) =>
   `Rs. ${Math.round(Number(amount) || 0).toLocaleString('en-PK')}`;
 
+/** Plain amount for table cells — thousands separated, no "Rs." clutter. */
+export const amt = (amount) =>
+  Math.round(Number(amount) || 0).toLocaleString('en-PK');
+
 const num = (value) => Number(value) || 0;
 
 /**
