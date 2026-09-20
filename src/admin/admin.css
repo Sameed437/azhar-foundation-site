@@ -670,6 +670,81 @@
 .adm-cell::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 .adm-cell[type='number'] { -moz-appearance: textfield; }
 
+/* ---------------- WhatsApp challan sending ---------------- */
+
+.adm-wasend {
+  background: var(--white);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sm);
+  padding: var(--space-4) var(--space-5);
+  margin-bottom: var(--space-5);
+}
+
+.adm-wasend summary {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: #1fa855;
+}
+
+.adm-wasend[open] summary { margin-bottom: var(--space-2); }
+
+.adm-wasend__list {
+  list-style: none;
+  margin-top: var(--space-3);
+  max-height: 340px;
+  overflow: auto;
+}
+
+.adm-wasend__list li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: 0.4rem 0.2rem;
+  border-bottom: 1px solid var(--border-soft);
+  font-size: var(--fs-sm);
+}
+
+.adm-wasend__list li:last-child { border-bottom: none; }
+
+.adm-wasend__who {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.adm-wasend__amt {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: var(--navy-600);
+  white-space: nowrap;
+}
+
+.adm-wasend__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: #25d366;
+  color: #fff;
+  border-radius: 999px;
+  padding: 0.3rem 0.85rem;
+  font-family: var(--font-display);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.adm-wasend__btn:hover { background: #1fb457; color: #fff; }
+
+.adm-wasend__nophone { color: var(--text-muted); font-size: var(--fs-xs); white-space: nowrap; }
+
 /* ---------------- yearly register (12 month columns) ---------------- */
 
 .adm-page--wide { max-width: none; }
