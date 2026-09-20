@@ -74,12 +74,14 @@ const YearRegister = () => {
       return a.family.id - b.family.id;
     });
 
-  const patchReceived = (familyId, month, value) => {
-    const existing = records[familyId]?.[month] || {};
-    const record = { fee: '', misc: 0, fine: 0, received: 0, receivedDate: '', note: '', ...existing };
+  const patchReceived = (familyId, row, value) => {
+    const existing = records[familyId]?.[row.month] || {};
+    const record = { fee: '', misc: 0, fine: 0, received: 0, receivedArrears: null, receivedDate: '', note: '', ...existing };
     record.received = value || 0;
+    // whatever exceeds the month's own fee counts as arrears recovery
+    record.receivedArrears = Math.max(0, (value || 0) - row.charge);
     record.receivedDate = value ? (existing.receivedDate || todayIso()) : '';
-    saveRecord(familyId, month, record);
+    saveRecord(familyId, row.month, record);
   };
 
   const monthTotals = months.map((month) =>
@@ -158,7 +160,7 @@ const YearRegister = () => {
                         value={row.received || ''}
                         placeholder="0"
                         ariaLabel={`Received from ${family.name} for ${monthLabel(row.month)}`}
-                        onCommit={(v) => patchReceived(family.id, row.month, v)}
+                        onCommit={(v) => patchReceived(family.id, row, v)}
                       />
                     </td>
                   );

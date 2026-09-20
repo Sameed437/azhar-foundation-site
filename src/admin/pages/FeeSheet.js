@@ -58,14 +58,39 @@ const FeeSheet = () => {
   const patchRecord = (familyId, patch) => {
     const existing = records[familyId]?.[month] || {};
     saveRecord(familyId, month, {
-      fee: '', misc: 0, fine: 0, received: 0, receivedDate: '', note: '',
+      fee: '', misc: 0, fine: 0, received: 0, receivedArrears: null, receivedDate: '', note: '',
       ...existing,
       ...patch,
     });
   };
 
-  const markPaid = (familyId, due) => {
-    patchRecord(familyId, { received: Math.max(0, due), receivedDate: todayIso() });
+  /** The stored split: what was typed, else fee-part-first from the total. */
+  const splitOf = (record, row) => {
+    const received = Number(record.received) || 0;
+    const arr = record.receivedArrears == null || record.receivedArrears === ''
+      ? Math.max(0, received - row.charge)
+      : Math.max(0, Number(record.receivedArrears) || 0);
+    return { fee: Math.max(0, received - arr), arr };
+  };
+
+  /** Commit one half of the split; the total is always fee part + arrears part. */
+  const commitSplit = (familyId, row, record, part, value) => {
+    const current = splitOf(record, row);
+    const fee = part === 'fee' ? Math.max(0, Number(value) || 0) : current.fee;
+    const arr = part === 'arr' ? Math.max(0, Number(value) || 0) : current.arr;
+    patchRecord(familyId, {
+      received: fee + arr,
+      receivedArrears: arr,
+      receivedDate: fee + arr > 0 ? (record.receivedDate || todayIso()) : '',
+    });
+  };
+
+  const markPaid = (familyId, row) => {
+    patchRecord(familyId, {
+      received: Math.max(0, row.due),
+      receivedArrears: Math.max(0, row.arrearsIn),
+      receivedDate: todayIso(),
+    });
   };
 
   const NumberCell = ({ value, onCommit, placeholder, ariaLabel }) => {
@@ -183,21 +208,20 @@ const FeeSheet = () => {
             <tr>
               <th className="adm-year__id">ID</th>
               <th className="adm-year__name">Family</th>
-              <th className="is-num">Arrears</th>
               <th className="is-num">Fee</th>
               <th className="is-num">Misc</th>
-              <th className="is-num" title="Arrears + this month's fee (+ misc), added together">
-                Total due
-              </th>
-              <th className="is-num">Received</th>
-              <th className="is-num" title="How much of the received money covered this month's fee">
+              <th className="is-num" title="Fee money received this month — type it here">
                 Fee rcvd
               </th>
-              <th className="is-num" title="How much of the received money recovered old arrears">
+              <th className="is-num" title="Left over from earlier months">Arrears</th>
+              <th className="is-num" title="Arrears money recovered this month — type it here">
                 Arr. rcvd
               </th>
-              <th className="is-num" title="Still owed after this payment — rolls to next month as arrears">
+              <th className="is-num" title="Still owed after these payments — rolls to next month as arrears">
                 Remaining
+              </th>
+              <th className="is-num" title="Fee + misc + arrears, added together — the challan amount">
+                Total due
               </th>
               <th>Date</th>
               <th>Status</th>
@@ -220,54 +244,53 @@ const FeeSheet = () => {
                       ))}
                     </div>
                   </td>
-                  <td className={`is-num ${row.arrearsIn > 0 ? 'is-due' : ''}`}>
-                    {row.arrearsIn > 0 ? amt(row.arrearsIn) : '—'}
-                  </td>
-                  <td className="is-num">
-                    <NumberCell
-                      value={record.fee ?? ''}
-                      placeholder={String(family.monthlyFee)}
-                      ariaLabel={`Fee for ${family.name}`}
-                      onCommit={(v) => patchRecord(family.id, { fee: v })}
-                    />
-                  </td>
-                  <td className="is-num">
-                    <NumberCell
-                      value={record.misc || ''}
-                      placeholder="0"
-                      ariaLabel={`Misc for ${family.name}`}
-                      onCommit={(v) => patchRecord(family.id, { misc: v || 0 })}
-                    />
-                  </td>
-                  <td className="is-num adm-table__due">{amt(row.due)}</td>
-                  <td className="is-num">
-                    <NumberCell
-                      value={record.received || ''}
-                      placeholder="0"
-                      ariaLabel={`Received from ${family.name}`}
-                      onCommit={(v) =>
-                        patchRecord(family.id, {
-                          received: v || 0,
-                          receivedDate: v ? (record.receivedDate || todayIso()) : '',
-                        })
-                      }
-                    />
-                  </td>
                   {(() => {
-                    const received = Number(record.received) || 0;
-                    const feeRecv = Math.min(received, row.charge);
-                    const arrRecv = Math.max(
-                      0,
-                      Math.min(received - feeRecv, Math.max(0, row.arrearsIn))
-                    );
+                    const split = splitOf(record, row);
                     const remaining = Math.max(0, row.balance);
                     return (
                       <>
-                        <td className="is-num adm-split">{feeRecv ? amt(feeRecv) : '—'}</td>
-                        <td className="is-num adm-split">{arrRecv ? amt(arrRecv) : '—'}</td>
+                        {/* ---- fee group ---- */}
+                        <td className="is-num">
+                          <NumberCell
+                            value={record.fee ?? ''}
+                            placeholder={String(family.monthlyFee)}
+                            ariaLabel={`Fee for ${family.name}`}
+                            onCommit={(v) => patchRecord(family.id, { fee: v })}
+                          />
+                        </td>
+                        <td className="is-num">
+                          <NumberCell
+                            value={record.misc || ''}
+                            placeholder="0"
+                            ariaLabel={`Misc for ${family.name}`}
+                            onCommit={(v) => patchRecord(family.id, { misc: v || 0 })}
+                          />
+                        </td>
+                        <td className="is-num">
+                          <NumberCell
+                            value={split.fee || ''}
+                            placeholder="0"
+                            ariaLabel={`Fee received from ${family.name}`}
+                            onCommit={(v) => commitSplit(family.id, row, record, 'fee', v)}
+                          />
+                        </td>
+                        {/* ---- arrears group ---- */}
+                        <td className={`is-num ${row.arrearsIn > 0 ? 'is-due' : ''}`}>
+                          {row.arrearsIn > 0 ? amt(row.arrearsIn) : '—'}
+                        </td>
+                        <td className="is-num">
+                          <NumberCell
+                            value={split.arr || ''}
+                            placeholder="0"
+                            ariaLabel={`Arrears received from ${family.name}`}
+                            onCommit={(v) => commitSplit(family.id, row, record, 'arr', v)}
+                          />
+                        </td>
                         <td className={`is-num ${remaining > 0 ? 'is-due' : 'is-clear'}`}>
                           {remaining > 0 ? amt(remaining) : 'Clear'}
                         </td>
+                        {/* ---- total ---- */}
+                        <td className="is-num adm-table__due">{amt(row.due)}</td>
                       </>
                     );
                   })()}
@@ -294,7 +317,7 @@ const FeeSheet = () => {
                       <button
                         type="button"
                         className="adm-mini"
-                        onClick={() => markPaid(family.id, row.due)}
+                        onClick={() => markPaid(family.id, row)}
                         title="Mark fully paid today"
                       >
                         <Icon name="check" size={14} strokeWidth={2.4} />
@@ -305,7 +328,7 @@ const FeeSheet = () => {
                       <button
                         type="button"
                         className="adm-mini adm-mini--undo"
-                        onClick={() => patchRecord(family.id, { received: 0, receivedDate: '' })}
+                        onClick={() => patchRecord(family.id, { received: 0, receivedArrears: 0, receivedDate: '' })}
                         title="Undo this payment (clears received amount and date)"
                       >
                         <Icon name="close" size={13} strokeWidth={2.4} />
@@ -325,7 +348,7 @@ const FeeSheet = () => {
             })}
             {!visible.length && (
               <tr>
-                <td colSpan={13} className="adm-table__empty">
+                <td colSpan={12} className="adm-table__empty">
                   {families.length ? 'Nothing to show for this filter.' : 'Add families first — then run the month here.'}
                 </td>
               </tr>

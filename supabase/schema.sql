@@ -35,12 +35,16 @@ create table if not exists public.fee_records (
   fee           integer,                         -- null = use family's monthly_fee
   misc          integer not null default 0,      -- admission / practical / other
   fine          integer not null default 0,
-  received      integer not null default 0,
+  received      integer not null default 0,      -- total received (fee + arrears parts)
+  received_arrears integer,                      -- the part of received that was against arrears
   received_date date,
   note          text,
   updated_at    timestamptz not null default now(),
   primary key (family_id, month)
 );
+
+-- Existing projects: add the split column without touching data
+alter table public.fee_records add column if not exists received_arrears integer;
 
 -- Single-row app settings (session year, due dates, fine, challan notes)
 create table if not exists public.app_settings (

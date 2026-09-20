@@ -87,6 +87,7 @@ export const createSupabaseDriver = () => {
           misc: row.misc ?? 0,
           fine: row.fine ?? 0,
           received: row.received ?? 0,
+          receivedArrears: row.received_arrears ?? null,
           receivedDate: row.received_date || '',
           note: row.note || '',
         };
@@ -120,6 +121,9 @@ export const createSupabaseDriver = () => {
         misc: Number(record.misc) || 0,
         fine: Number(record.fine) || 0,
         received: Number(record.received) || 0,
+        received_arrears: record.receivedArrears == null || record.receivedArrears === ''
+          ? null
+          : Number(record.receivedArrears) || 0,
         received_date: record.receivedDate || null,
         note: record.note || null,
       });
@@ -156,6 +160,9 @@ export const createSupabaseDriver = () => {
             misc: Number(record.misc) || 0,
             fine: Number(record.fine) || 0,
             received: Number(record.received) || 0,
+            received_arrears: record.receivedArrears == null || record.receivedArrears === ''
+              ? null
+              : Number(record.receivedArrears) || 0,
             received_date: record.receivedDate || null,
             note: record.note || null,
           });
