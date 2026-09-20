@@ -715,6 +715,21 @@
 
 .adm-wa__send { white-space: nowrap; }
 
+.adm-wa__pdf {
+  border: 1px solid var(--border);
+  background: var(--white);
+  color: var(--navy-600);
+  border-radius: 999px;
+  padding: 0.3rem 0.7rem;
+  margin-left: 0.35rem;
+  font-family: var(--font-display);
+  font-size: var(--fs-micro);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.adm-wa__pdf:hover { background: var(--navy-50); }
+
 .adm-wa__unsent {
   border: none;
   background: none;

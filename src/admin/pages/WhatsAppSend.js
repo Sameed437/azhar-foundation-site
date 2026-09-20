@@ -5,6 +5,7 @@ import { useAdmin } from '../AdminContext';
 import { monthLabel, monthSummary, rs } from '../data/calc';
 import { familyHasClass, uniqueClasses } from '../data/classes';
 import { waChallanLink, waPhone } from '../data/whatsapp';
+import { buildChallanPdf, challanPdfName } from '../data/challanPdf';
 
 /* "Sent" ticks are remembered per month on this device (browser storage),
    so a sending session survives a refresh. They are a checklist aid, not
@@ -145,6 +146,34 @@ const WhatsAppSend = () => {
     markSent(next.family.id);
   };
 
+  /**
+   * Challan PDF: on phones the share sheet opens (pick WhatsApp → contact →
+   * the PDF attaches itself); on computers it downloads, ready to drag into
+   * WhatsApp Web. WhatsApp does not allow a link to attach files directly.
+   */
+  const sharePdf = async (items) => {
+    if (!items.length) return;
+    const doc = await buildChallanPdf(items, month, settings);
+    const name = challanPdfName(items, month);
+    const blob = doc.output('blob');
+    try {
+      const file = new File([blob], name, { type: 'application/pdf' });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: name });
+        items.forEach(({ family }) => markSent(family.id));
+        return;
+      }
+    } catch (error) {
+      if (error && error.name === 'AbortError') return; // user closed the share sheet
+    }
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = name;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="adm-page">
       <header className="adm-page__head">
@@ -153,7 +182,9 @@ const WhatsAppSend = () => {
           <p>
             Send each family their {monthLabel(month)} challan on WhatsApp. Adjust the fee or
             phone number right here, tick who to send to, then press the green button — WhatsApp
-            opens with the full message ready, and the family is ticked off the list.
+            opens with the full message ready. <strong>PDF</strong> makes the printable challan
+            form as a file: on a phone the share sheet opens (choose WhatsApp → the contact) and
+            the PDF attaches; on a computer it downloads, ready to drag into WhatsApp Web.
           </p>
         </div>
         <div className="adm-monthpick">
@@ -192,6 +223,16 @@ const WhatsAppSend = () => {
             : selected.size
               ? 'All selected are sent'
               : 'Tick families below to start'}
+        </button>
+        <button
+          type="button"
+          className="btn btn--ghost"
+          disabled={!selected.size}
+          onClick={() => sharePdf(visible.filter(({ family }) => selected.has(family.id)))}
+          title="One PDF with a challan page per selected family — share on a phone, download on a computer"
+        >
+          <Icon name="download" size={16} />
+          PDF of selected
         </button>
         <span className="adm-wa__stats">
           {selected.size} selected · {sentCount} sent this month
@@ -307,6 +348,14 @@ const WhatsAppSend = () => {
                     ) : (
                       <span className="adm-wasend__nophone">no phone</span>
                     )}
+                    <button
+                      type="button"
+                      className="adm-wa__pdf"
+                      onClick={() => sharePdf([{ family, row }])}
+                      title="Challan PDF — on a phone the share sheet opens (choose WhatsApp); on a computer it downloads"
+                    >
+                      PDF
+                    </button>
                     {isSent && (
                       <button
                         type="button"
