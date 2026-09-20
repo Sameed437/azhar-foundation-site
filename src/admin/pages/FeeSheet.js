@@ -208,20 +208,17 @@ const FeeSheet = () => {
             <tr>
               <th className="adm-year__id">ID</th>
               <th className="adm-year__name">Family</th>
-              <th className="is-num">Fee</th>
-              <th className="is-num">Misc</th>
-              <th className="is-num" title="Fee money received this month — type it here">
+              <th className="is-num adm-grp-fee">Fee</th>
+              <th className="is-num adm-grp-fee">Misc</th>
+              <th className="is-num adm-grp-fee" title="Fee money received this month — type it here">
                 Fee rcvd
               </th>
-              <th className="is-num" title="Left over from earlier months">Arrears</th>
-              <th className="is-num" title="Arrears money recovered this month — type it here">
+              <th className="is-num adm-grp-arr" title="Left over from earlier months">Arrears</th>
+              <th className="is-num adm-grp-arr" title="Arrears money recovered this month — type it here">
                 Arr. rcvd
               </th>
-              <th className="is-num" title="Still owed after these payments — rolls to next month as arrears">
+              <th className="is-num adm-grp-arr" title="Still owed after these payments — rolls to next month as arrears">
                 Remaining
-              </th>
-              <th className="is-num" title="Fee + misc + arrears, added together — the challan amount">
-                Total due
               </th>
               <th>Date</th>
               <th>Status</th>
@@ -250,7 +247,7 @@ const FeeSheet = () => {
                     return (
                       <>
                         {/* ---- fee group ---- */}
-                        <td className="is-num">
+                        <td className="is-num adm-grp-fee">
                           <NumberCell
                             value={record.fee ?? ''}
                             placeholder={String(family.monthlyFee)}
@@ -258,7 +255,7 @@ const FeeSheet = () => {
                             onCommit={(v) => patchRecord(family.id, { fee: v })}
                           />
                         </td>
-                        <td className="is-num">
+                        <td className="is-num adm-grp-fee">
                           <NumberCell
                             value={record.misc || ''}
                             placeholder="0"
@@ -266,7 +263,7 @@ const FeeSheet = () => {
                             onCommit={(v) => patchRecord(family.id, { misc: v || 0 })}
                           />
                         </td>
-                        <td className="is-num">
+                        <td className="is-num adm-grp-fee">
                           <NumberCell
                             value={split.fee || ''}
                             placeholder="0"
@@ -275,10 +272,10 @@ const FeeSheet = () => {
                           />
                         </td>
                         {/* ---- arrears group ---- */}
-                        <td className={`is-num ${row.arrearsIn > 0 ? 'is-due' : ''}`}>
+                        <td className={`is-num adm-grp-arr ${row.arrearsIn > 0 ? 'is-due' : ''}`}>
                           {row.arrearsIn > 0 ? amt(row.arrearsIn) : '—'}
                         </td>
-                        <td className="is-num">
+                        <td className="is-num adm-grp-arr">
                           <NumberCell
                             value={split.arr || ''}
                             placeholder="0"
@@ -286,11 +283,9 @@ const FeeSheet = () => {
                             onCommit={(v) => commitSplit(family.id, row, record, 'arr', v)}
                           />
                         </td>
-                        <td className={`is-num ${remaining > 0 ? 'is-due' : 'is-clear'}`}>
+                        <td className={`is-num adm-grp-arr ${remaining > 0 ? 'is-due' : 'is-clear'}`}>
                           {remaining > 0 ? amt(remaining) : 'Clear'}
                         </td>
-                        {/* ---- total ---- */}
-                        <td className="is-num adm-table__due">{amt(row.due)}</td>
                       </>
                     );
                   })()}
@@ -348,7 +343,7 @@ const FeeSheet = () => {
             })}
             {!visible.length && (
               <tr>
-                <td colSpan={12} className="adm-table__empty">
+                <td colSpan={11} className="adm-table__empty">
                   {families.length ? 'Nothing to show for this filter.' : 'Add families first — then run the month here.'}
                 </td>
               </tr>
