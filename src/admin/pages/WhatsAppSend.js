@@ -75,7 +75,9 @@ const WhatsAppSend = () => {
   );
 
   const visible = summary.perFamily.filter(({ family, row }) => {
-    if (!row || row.inactive) return false;
+    if (!row) return false;
+    // left families still get reminders while they owe money
+    if (row.inactive && row.balance <= 0) return false;
     if (!familyHasClass(family, klass)) return false;
     if (who === 'due' && row.balance <= 0) return false;
     if (!query.trim()) return true;

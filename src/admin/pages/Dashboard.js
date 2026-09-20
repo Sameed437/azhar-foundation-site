@@ -217,7 +217,7 @@ const Dashboard = () => {
   const defaulters = useMemo(
     () =>
       summary.perFamily
-        .filter(({ row }) => row && !row.inactive && row.balance > 0)
+        .filter(({ row }) => row && row.balance > 0)
         .sort((a, b) => b.row.balance - a.row.balance)
         .slice(0, 8),
     [summary]

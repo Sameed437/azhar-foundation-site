@@ -10,7 +10,7 @@ const STATUS_LABEL = {
   partial: 'Partial',
   unpaid: 'Unpaid',
   clear: 'Clear',
-  inactive: '—',
+  inactive: 'Left',
 };
 
 const todayIso = () => new Date().toISOString().slice(0, 10);
@@ -36,7 +36,8 @@ const FeeSheet = () => {
   );
 
   const visible = summary.perFamily.filter(({ family, row }) => {
-    if (row?.inactive) return false;
+    // left families stay on the register while they still owe (or paid) money
+    if (row?.inactive && row.balance <= 0 && !(row.received > 0)) return false;
     if (!familyHasClass(family, klass)) return false;
     if (status === 'due' && row.balance <= 0) return false;
     if (['paid', 'partial', 'unpaid'].includes(status) && row.status !== status) return false;
@@ -246,31 +247,41 @@ const FeeSheet = () => {
                     const remaining = Math.max(0, row.balance);
                     return (
                       <>
-                        {/* ---- fee group ---- */}
-                        <td className="is-num adm-grp-fee">
-                          <NumberCell
-                            value={record.fee ?? ''}
-                            placeholder={String(family.monthlyFee)}
-                            ariaLabel={`Fee for ${family.name}`}
-                            onCommit={(v) => patchRecord(family.id, { fee: v })}
-                          />
-                        </td>
-                        <td className="is-num adm-grp-fee">
-                          <NumberCell
-                            value={record.misc || ''}
-                            placeholder="0"
-                            ariaLabel={`Misc for ${family.name}`}
-                            onCommit={(v) => patchRecord(family.id, { misc: v || 0 })}
-                          />
-                        </td>
-                        <td className="is-num adm-grp-fee">
-                          <NumberCell
-                            value={split.fee || ''}
-                            placeholder="0"
-                            ariaLabel={`Fee received from ${family.name}`}
-                            onCommit={(v) => commitSplit(family.id, row, record, 'fee', v)}
-                          />
-                        </td>
+                        {/* ---- fee group (a left family is charged no new fee) ---- */}
+                        {row.inactive ? (
+                          <>
+                            <td className="is-num adm-grp-fee adm-split">—</td>
+                            <td className="is-num adm-grp-fee adm-split">—</td>
+                            <td className="is-num adm-grp-fee adm-split">—</td>
+                          </>
+                        ) : (
+                          <>
+                            <td className="is-num adm-grp-fee">
+                              <NumberCell
+                                value={record.fee ?? ''}
+                                placeholder={String(family.monthlyFee)}
+                                ariaLabel={`Fee for ${family.name}`}
+                                onCommit={(v) => patchRecord(family.id, { fee: v })}
+                              />
+                            </td>
+                            <td className="is-num adm-grp-fee">
+                              <NumberCell
+                                value={record.misc || ''}
+                                placeholder="0"
+                                ariaLabel={`Misc for ${family.name}`}
+                                onCommit={(v) => patchRecord(family.id, { misc: v || 0 })}
+                              />
+                            </td>
+                            <td className="is-num adm-grp-fee">
+                              <NumberCell
+                                value={split.fee || ''}
+                                placeholder="0"
+                                ariaLabel={`Fee received from ${family.name}`}
+                                onCommit={(v) => commitSplit(family.id, row, record, 'fee', v)}
+                              />
+                            </td>
+                          </>
+                        )}
                         {/* ---- arrears group ---- */}
                         <td className={`is-num adm-grp-arr ${row.arrearsIn > 0 ? 'is-due' : ''}`}>
                           {row.arrearsIn > 0 ? amt(row.arrearsIn) : '—'}

@@ -130,7 +130,9 @@ const Challans = () => {
   );
 
   const selected = summary.perFamily.filter(({ family, row }) => {
-    if (!row || row.inactive) return false;
+    if (!row) return false;
+    // left families still get a challan while they owe money
+    if (row.inactive && row.balance <= 0) return false;
     if (scope === 'one') return family.id === Number(familyId);
     if (!familyHasClass(family, klass)) return false;
     if (scope === 'due') return row.balance > 0;

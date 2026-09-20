@@ -80,7 +80,23 @@ export const familyLedger = (family, recordsByMonth, months) => {
 
   for (const month of months) {
     if (month < activeFrom || month > activeTo) {
-      rows.push({ month, inactive: true, charge: 0, received: 0, arrearsIn: arrears, due: arrears, balance: arrears, status: 'inactive' });
+      // No new fee is charged outside the active range, but old arrears stay
+      // collectable: payments recorded here still recover them.
+      const received = num(recordsByMonth[month]?.received);
+      const due = arrears;
+      const balance = due - received;
+      rows.push({
+        month,
+        inactive: true,
+        record: recordsByMonth[month],
+        charge: 0,
+        received,
+        arrearsIn: arrears,
+        due,
+        balance,
+        status: received > 0 ? (balance <= 0 ? 'paid' : 'partial') : 'inactive',
+      });
+      arrears = Math.max(0, balance);
       continue;
     }
 
@@ -116,7 +132,10 @@ export const monthSummary = (families, records, months, month) => {
     return { family, row, ledger };
   });
 
-  const active = perFamily.filter(({ row }) => row && !row.inactive);
+  // Inactive (left) families still count while they owe or pay something —
+  // leaving the school never erases a balance.
+  const active = perFamily.filter(({ row }) =>
+    row && (!row.inactive || row.balance > 0 || row.received > 0));
   const total = (pick) => active.reduce((sum, entry) => sum + pick(entry.row), 0);
 
   return {
