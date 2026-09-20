@@ -670,6 +670,61 @@
 .adm-cell::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 .adm-cell[type='number'] { -moz-appearance: textfield; }
 
+/* ---------------- WhatsApp page ---------------- */
+
+.adm-wa__bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  background: var(--white);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sm);
+  padding: var(--space-4) var(--space-5);
+  margin-bottom: var(--space-4);
+}
+
+.adm-wa__go {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: none;
+  cursor: pointer;
+  background: #25d366;
+  color: #fff;
+  border-radius: 999px;
+  padding: 0.65rem 1.3rem;
+  font-family: var(--font-display);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+}
+
+.adm-wa__go:hover { background: #1fb457; }
+.adm-wa__go:disabled { background: var(--ink-200); cursor: default; }
+
+.adm-wa__stats { font-size: var(--fs-xs); color: var(--text-muted); }
+.adm-wa__warn { color: var(--danger-600); font-weight: 700; }
+
+.adm-wa__check { width: 34px; text-align: center; }
+.adm-wa__check input { width: 16px; height: 16px; accent-color: #25d366; }
+
+.adm-cell--phone { width: 128px; text-align: left; font-size: var(--fs-xs); }
+
+.adm-table--wa tr.is-wasent td { background: #f0faf3; }
+
+.adm-wa__send { white-space: nowrap; }
+
+.adm-wa__unsent {
+  border: none;
+  background: none;
+  color: #137333;
+  font-size: var(--fs-micro);
+  font-weight: 700;
+  margin-left: 0.4rem;
+  cursor: pointer;
+}
+
 /* ---------------- WhatsApp challan sending ---------------- */
 
 .adm-wasend {

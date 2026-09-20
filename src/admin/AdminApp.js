@@ -8,6 +8,7 @@ import Families from './pages/Families';
 import FeeSheet from './pages/FeeSheet';
 import YearRegister from './pages/YearRegister';
 import Challans from './pages/Challans';
+import WhatsAppSend from './pages/WhatsAppSend';
 import AdminSettings from './pages/AdminSettings';
 import { sessionLabel } from './data/calc';
 import './admin.css';
@@ -18,6 +19,7 @@ const NAV = [
   { to: '/admin/fees', label: 'Fee Sheet', icon: 'grid' },
   { to: '/admin/register', label: 'Yearly Register', icon: 'book' },
   { to: '/admin/challans', label: 'Challans', icon: 'receipt' },
+  { to: '/admin/whatsapp', label: 'WhatsApp', icon: 'whatsapp' },
   { to: '/admin/settings', label: 'Settings', icon: 'settings' },
 ];
 
@@ -151,6 +153,7 @@ const Shell = () => {
           <Route path="fees" element={<FeeSheet />} />
           <Route path="register" element={<YearRegister />} />
           <Route path="challans" element={<Challans />} />
+          <Route path="whatsapp" element={<WhatsAppSend />} />
           <Route path="settings" element={<AdminSettings />} />
           <Route path="*" element={<Navigate to="/admin" replace />} />
         </Routes>

@@ -1,59 +1,10 @@
 import React, { useMemo, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import Icon from '../../components/Icon';
 import { useAdmin } from '../AdminContext';
 import { monthLabel, monthShort, monthSummary, rs } from '../data/calc';
 import { familyHasClass, uniqueClasses } from '../data/classes';
-
-/** "5-Sep-2026" — the date style used on the existing Word challan. */
-const challanDate = (month, day) => {
-  const [year, monthNum] = month.split('-').map(Number);
-  const names = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  return `${day}-${names[monthNum - 1]}-${year}`;
-};
-
-/** "0300-1234567" / "03001234567" / "+92 300..." → "923001234567" for wa.me */
-const waPhone = (phone) => {
-  let digits = (phone || '').replace(/\D/g, '');
-  if (!digits) return '';
-  if (digits.startsWith('0')) digits = `92${digits.slice(1)}`;
-  else if (digits.startsWith('3') && digits.length === 10) digits = `92${digits}`;
-  return digits.startsWith('92') && digits.length === 12 ? digits : '';
-};
-
-/** The challan as a WhatsApp message — same numbers as the printed form. */
-const challanMessage = (family, row, month, settings) => {
-  const enrolled = family.students.filter((s) => !s.left);
-  const listed = enrolled.length ? enrolled : family.students;
-  const names = listed.map((s) => `${s.name}${s.klass ? ` (${s.klass})` : ''}`).join(' + ')
-    || family.name;
-  const monthlyFee = row.charge - (Number(row.record?.misc) || 0) - (Number(row.record?.fine) || 0);
-
-  const lines = [
-    `*${settings.schoolName}*`,
-    `Fee Challan — ${monthLabel(month)}`,
-    `Family ID: ${family.id}`,
-    `Student(s): ${names}`,
-    '',
-    `Monthly fee: ${rs(monthlyFee)}`,
-  ];
-  if (Number(row.record?.misc) > 0) lines.push(`Other charges: ${rs(row.record.misc)}`);
-  if (row.arrearsIn > 0) lines.push(`Previous balance: ${rs(row.arrearsIn)}`);
-  if (Number(row.record?.fine) > 0) lines.push(`Fine: ${rs(row.record.fine)}`);
-  if (Number(row.record?.received) > 0) {
-    lines.push(`Already paid: ${rs(row.record.received)}`);
-    lines.push(`*Remaining payable: ${rs(Math.max(0, row.balance))}*`);
-  } else {
-    lines.push(`*Total payable: ${rs(Math.max(0, row.due))}*`);
-  }
-  lines.push(
-    '',
-    `Due date: ${challanDate(month, settings.dueDay)} (valid till ${challanDate(month, settings.validityDay)})`,
-    'Please pay at the school office. Thank you.'
-  );
-  return lines.join('\n');
-};
+import { challanDate } from '../data/whatsapp';
 
 /** One printed copy (the challan is printed twice: student + office). */
 const ChallanCopy = ({ copy, family, row, month, settings }) => (
@@ -255,43 +206,11 @@ const Challans = () => {
       )}
 
       {selected.length > 0 && (
-        <details className="adm-wasend adm-noprint">
-          <summary>
-            <Icon name="whatsapp" size={18} />
-            Send {selected.length === 1 ? 'this challan' : `these ${selected.length} challans`} on
-            WhatsApp — {monthLabel(month)}
-          </summary>
-          <p className="adm-help">
-            Each Send button opens WhatsApp with the full challan message ready — the{' '}
-            {monthLabel(month)} fee, any previous balance, the total and the due date — you
-            just press send there. WhatsApp allows one family at a time. Greyed rows have no
-            phone number saved; add it on the Students &amp; Families page.
-          </p>
-          <ul className="adm-wasend__list">
-            {selected.map(({ family, row }) => {
-              const phone = waPhone(family.phone);
-              return (
-                <li key={family.id}>
-                  <span className="adm-wasend__who">#{family.id} — {family.name}</span>
-                  <span className="adm-wasend__amt">{rs(Math.max(0, row.balance))}</span>
-                  {phone ? (
-                    <a
-                      className="adm-wasend__btn"
-                      target="_blank"
-                      rel="noreferrer"
-                      href={`https://wa.me/${phone}?text=${encodeURIComponent(challanMessage(family, row, month, settings))}`}
-                    >
-                      <Icon name="whatsapp" size={15} />
-                      Send
-                    </a>
-                  ) : (
-                    <span className="adm-wasend__nophone">no phone saved</span>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
-        </details>
+        <p className="adm-help adm-noprint">
+          Prefer sending instead of printing? The{' '}
+          <Link to={`/admin/whatsapp?month=${month}`}>WhatsApp page</Link> sends these same
+          challans to parents, with select-all and a sending queue.
+        </p>
       )}
 
       <div className="challan-sheets">
