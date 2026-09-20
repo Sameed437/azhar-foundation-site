@@ -53,7 +53,12 @@ const Families = () => {
         // What the family owes up to the CURRENT month only — future months
         // of the session are not counted.
         const asOf = ledger.rows.find((row) => row.month === currentMonth);
-        return { family, ledger, balanceDue: asOf ? asOf.balance : ledger.closingBalance };
+        return {
+          family,
+          ledger,
+          balanceDue: asOf ? asOf.balance : ledger.closingBalance,
+          arrears: asOf ? Math.max(0, asOf.arrearsIn) : 0,
+        };
       }),
     [families, records, months, currentMonth]
   );
@@ -166,9 +171,9 @@ const Families = () => {
           <p>
             {families.length} family accounts · {totalStudents} students
             {leftStudents > 0 && ` (${leftStudents} left the school)`}. Siblings share one
-            account and one challan. <strong>Remaining</strong> is everything owed up to{' '}
-            {monthShort(currentMonth)} (old months included, future months not) minus
-            everything paid.
+            account and one challan. <strong>Arrears</strong> is what&rsquo;s left from earlier
+            months; <strong>Remaining</strong> adds {monthShort(currentMonth)}&rsquo;s fee.
+            Future months are never counted.
           </p>
         </div>
         <div className="adm-page__actions">
@@ -233,6 +238,12 @@ const Families = () => {
               <th className="is-num">Concession</th>
               <th
                 className="is-num"
+                title="Left over from earlier months only — this month's fee not included"
+              >
+                Arrears
+              </th>
+              <th
+                className="is-num"
                 title="Old months + this month, minus everything paid. Future months are not counted."
               >
                 Remaining
@@ -241,7 +252,7 @@ const Families = () => {
             </tr>
           </thead>
           <tbody>
-            {visible.map(({ family, balanceDue }) => {
+            {visible.map(({ family, balanceDue, arrears }) => {
               const concession = family.listFee !== '' && family.listFee != null
                 ? Math.max(0, Number(family.listFee) - Number(family.monthlyFee))
                 : 0;
@@ -276,6 +287,9 @@ const Families = () => {
                   </td>
                   <td className="is-num">{amt(family.monthlyFee)}</td>
                   <td className="is-num">{concession ? amt(concession) : '—'}</td>
+                  <td className={`is-num ${arrears > 0 ? 'is-due' : ''}`}>
+                    {arrears > 0 ? amt(arrears) : '—'}
+                  </td>
                   <td className={`is-num ${balanceDue > 0 ? 'is-due' : 'is-clear'}`}>
                     {balanceDue > 0 ? amt(balanceDue) : 'Clear'}
                   </td>
@@ -289,7 +303,7 @@ const Families = () => {
             })}
             {!visible.length && (
               <tr>
-                <td colSpan={7} className="adm-table__empty">
+                <td colSpan={8} className="adm-table__empty">
                   {families.length
                     ? 'Nothing matches that search.'
                     : 'No families yet — add the first one, or import your Excel rows.'}
