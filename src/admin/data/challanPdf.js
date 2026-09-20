@@ -44,19 +44,19 @@ const amountLines = (row) => {
   if (Number(record.misc) > 0) {
     lines.push({ label: `Other charges${record.note ? ` (${record.note})` : ''}`, value: rs(record.misc) });
   }
-  if (row.arrearsIn > 0) lines.push({ label: 'Previous balance (arrears)', value: rs(row.arrearsIn) });
-  if (row.arrearsIn < 0) lines.push({ label: 'Credit carried forward', value: `- ${rs(-row.arrearsIn)}` });
+  if (row.arrearsIn > 0) lines.push({ label: 'Arrears (previous balance)', value: rs(row.arrearsIn) });
+  if (row.arrearsIn < 0) lines.push({ label: 'Less: advance already paid', value: rs(-row.arrearsIn), paid: true });
   if (Number(record.fine) > 0) lines.push({ label: 'Fine', value: rs(record.fine) });
   if (Number(record.received) > 0) {
-    lines.push({ label: 'Total for the month', value: rs(Math.max(0, row.due)) });
+    lines.push({ label: 'Total (fee + arrears)', value: rs(Math.max(0, row.due)) });
     lines.push({
-      label: `Already paid${record.receivedDate ? ` (${record.receivedDate})` : ''}`,
-      value: `- ${rs(record.received)}`,
+      label: `Paid so far${record.receivedDate ? ` (${record.receivedDate})` : ''}`,
+      value: rs(record.received),
       paid: true,
     });
     lines.push({ label: 'Remaining payable', value: rs(Math.max(0, row.balance)), total: true });
   } else {
-    lines.push({ label: 'Total payable', value: rs(Math.max(0, row.due)), total: true });
+    lines.push({ label: 'Total payable (fee + arrears)', value: rs(Math.max(0, row.due)), total: true });
   }
   return lines;
 };

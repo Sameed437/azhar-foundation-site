@@ -181,14 +181,24 @@ const FeeSheet = () => {
         <table className="adm-table adm-table--sheet">
           <thead>
             <tr>
-              <th>ID</th>
-              <th>Family</th>
+              <th className="adm-year__id">ID</th>
+              <th className="adm-year__name">Family</th>
               <th className="is-num">Arrears</th>
               <th className="is-num">Fee</th>
               <th className="is-num">Misc</th>
-              <th className="is-num">Fine</th>
-              <th className="is-num">Total due</th>
+              <th className="is-num" title="Arrears + this month's fee (+ misc), added together">
+                Total due
+              </th>
               <th className="is-num">Received</th>
+              <th className="is-num" title="How much of the received money covered this month's fee">
+                Fee rcvd
+              </th>
+              <th className="is-num" title="How much of the received money recovered old arrears">
+                Arr. rcvd
+              </th>
+              <th className="is-num" title="Still owed after this payment — rolls to next month as arrears">
+                Remaining
+              </th>
               <th>Date</th>
               <th>Status</th>
               <th aria-label="Actions" />
@@ -199,8 +209,8 @@ const FeeSheet = () => {
               const record = row.record || {};
               return (
                 <tr key={family.id} className={`is-${row.status}`}>
-                  <td className="adm-table__id">{family.id}</td>
-                  <td>
+                  <td className="adm-year__id adm-table__id">{family.id}</td>
+                  <td className="adm-year__name">
                     <div className="adm-students adm-students--tight">
                       {family.students.map((s, i) => (
                         <span key={i} className={`adm-student${s.left ? ' is-left' : ''}`}>
@@ -229,14 +239,6 @@ const FeeSheet = () => {
                       onCommit={(v) => patchRecord(family.id, { misc: v || 0 })}
                     />
                   </td>
-                  <td className="is-num">
-                    <NumberCell
-                      value={record.fine || ''}
-                      placeholder="0"
-                      ariaLabel={`Fine for ${family.name}`}
-                      onCommit={(v) => patchRecord(family.id, { fine: v || 0 })}
-                    />
-                  </td>
                   <td className="is-num adm-table__due">{rs(row.due)}</td>
                   <td className="is-num">
                     <NumberCell
@@ -251,6 +253,24 @@ const FeeSheet = () => {
                       }
                     />
                   </td>
+                  {(() => {
+                    const received = Number(record.received) || 0;
+                    const feeRecv = Math.min(received, row.charge);
+                    const arrRecv = Math.max(
+                      0,
+                      Math.min(received - feeRecv, Math.max(0, row.arrearsIn))
+                    );
+                    const remaining = Math.max(0, row.balance);
+                    return (
+                      <>
+                        <td className="is-num adm-split">{feeRecv ? rs(feeRecv) : '—'}</td>
+                        <td className="is-num adm-split">{arrRecv ? rs(arrRecv) : '—'}</td>
+                        <td className={`is-num ${remaining > 0 ? 'is-due' : 'is-clear'}`}>
+                          {remaining > 0 ? rs(remaining) : 'Clear'}
+                        </td>
+                      </>
+                    );
+                  })()}
                   <td>
                     <input
                       className="adm-cell adm-cell--date"
@@ -301,7 +321,7 @@ const FeeSheet = () => {
             })}
             {!visible.length && (
               <tr>
-                <td colSpan={11} className="adm-table__empty">
+                <td colSpan={13} className="adm-table__empty">
                   {families.length ? 'Nothing to show for this filter.' : 'Add families first — then run the month here.'}
                 </td>
               </tr>

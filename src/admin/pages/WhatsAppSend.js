@@ -281,7 +281,9 @@ const WhatsAppSend = () => {
               <th>Phone</th>
               <th className="is-num">Fee ({monthLabel(month).split(' ')[0]})</th>
               <th className="is-num">Arrears</th>
-              <th className="is-num">Total payable</th>
+              <th className="is-num" title="Fee + arrears, added — what the challan asks for">
+                Total (fee + arrears)
+              </th>
               <th>Send</th>
             </tr>
           </thead>
@@ -332,7 +334,7 @@ const WhatsAppSend = () => {
                   <td className={`is-num ${row.arrearsIn > 0 ? 'is-due' : ''}`}>
                     {row.arrearsIn ? rs(row.arrearsIn) : '—'}
                   </td>
-                  <td className="is-num adm-table__due">{rs(Math.max(0, row.balance))}</td>
+                  <td className="is-num adm-table__due">{rs(Math.max(0, row.due))}</td>
                   <td className="adm-wa__send">
                     {link ? (
                       <a

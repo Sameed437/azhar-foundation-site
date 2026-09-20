@@ -61,14 +61,14 @@ const ChallanCopy = ({ copy, family, row, month, settings }) => (
         )}
         {row.arrearsIn > 0 && (
           <tr>
-            <td>Previous balance (arrears)</td>
+            <td>Arrears (previous balance)</td>
             <td>{rs(row.arrearsIn)}</td>
           </tr>
         )}
         {row.arrearsIn < 0 && (
-          <tr>
-            <td>Credit carried forward</td>
-            <td>− {rs(-row.arrearsIn)}</td>
+          <tr className="challan__paid">
+            <td>Less: advance already paid</td>
+            <td>{rs(-row.arrearsIn)}</td>
           </tr>
         )}
         {Number(row.record?.fine) > 0 && (
@@ -80,15 +80,15 @@ const ChallanCopy = ({ copy, family, row, month, settings }) => (
         {Number(row.record?.received) > 0 ? (
           <>
             <tr>
-              <td>Total for the month</td>
+              <td>Total (fee + arrears)</td>
               <td>{rs(Math.max(0, row.due))}</td>
             </tr>
             <tr className="challan__paid">
               <td>
-                Already paid
+                Paid so far
                 {row.record?.receivedDate ? ` (${row.record.receivedDate})` : ''}
               </td>
-              <td>− {rs(row.record.received)}</td>
+              <td>{rs(row.record.received)}</td>
             </tr>
             <tr className="challan__total">
               <td>Remaining payable</td>
@@ -97,7 +97,7 @@ const ChallanCopy = ({ copy, family, row, month, settings }) => (
           </>
         ) : (
           <tr className="challan__total">
-            <td>Total payable</td>
+            <td>Total payable (fee + arrears)</td>
             <td>{rs(Math.max(0, row.due))}</td>
           </tr>
         )}

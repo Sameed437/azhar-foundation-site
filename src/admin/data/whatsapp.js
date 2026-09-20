@@ -34,13 +34,14 @@ export const challanMessage = (family, row, month, settings) => {
     `Monthly fee: ${rs(monthlyFee)}`,
   ];
   if (Number(row.record?.misc) > 0) lines.push(`Other charges: ${rs(row.record.misc)}`);
-  if (row.arrearsIn > 0) lines.push(`Previous balance: ${rs(row.arrearsIn)}`);
+  if (row.arrearsIn > 0) lines.push(`Arrears (previous balance): ${rs(row.arrearsIn)}`);
   if (Number(row.record?.fine) > 0) lines.push(`Fine: ${rs(row.record.fine)}`);
   if (Number(row.record?.received) > 0) {
-    lines.push(`Already paid: ${rs(row.record.received)}`);
+    lines.push(`Total (fee + arrears): ${rs(Math.max(0, row.due))}`);
+    lines.push(`Paid so far: ${rs(row.record.received)}`);
     lines.push(`*Remaining payable: ${rs(Math.max(0, row.balance))}*`);
   } else {
-    lines.push(`*Total payable: ${rs(Math.max(0, row.due))}*`);
+    lines.push(`*Total payable (fee + arrears): ${rs(Math.max(0, row.due))}*`);
   }
   lines.push(
     '',
