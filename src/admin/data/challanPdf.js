@@ -45,7 +45,6 @@ const amountLines = (row) => {
     lines.push({ label: `Other charges${record.note ? ` (${record.note})` : ''}`, value: rs(record.misc) });
   }
   if (row.arrearsIn > 0) lines.push({ label: 'Arrears (previous balance)', value: rs(row.arrearsIn) });
-  if (row.arrearsIn < 0) lines.push({ label: 'Less: advance already paid', value: rs(-row.arrearsIn), paid: true });
   if (Number(record.fine) > 0) lines.push({ label: 'Fine', value: rs(record.fine) });
   if (Number(record.received) > 0) {
     lines.push({ label: 'Total (fee + arrears)', value: rs(Math.max(0, row.due)) });

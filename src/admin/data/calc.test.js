@@ -70,12 +70,13 @@ describe('familyLedger', () => {
     expect(september.charge).toBe(1000);
   });
 
-  test('an overpayment becomes credit against the next month', () => {
+  test('an overpayment never rolls forward - the school tracks no advances', () => {
     const family = { id: 1, monthlyFee: 1000 };
     const records = { '2026-03': { received: 2500 } };
     const { rows } = familyLedger(family, records, MONTHS);
-    expect(rows[0].balance).toBe(-1500);
-    expect(rows[1].due).toBe(-500); // 1000 charge minus 1500 credit
+    expect(rows[0].balance).toBe(-1500); // visible within its own month only
+    expect(rows[1].arrearsIn).toBe(0); // no credit carried
+    expect(rows[1].due).toBe(1000); // next month charges the plain fee
   });
 });
 

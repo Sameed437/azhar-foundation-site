@@ -94,7 +94,10 @@ export const familyLedger = (family, recordsByMonth, months) => {
       : balance <= 0 ? 'paid' : 'partial';
 
     rows.push({ month, record, charge, received, arrearsIn: arrears, due, balance, status });
-    arrears = balance;
+    // The school does not track advance payments: shortfalls roll forward as
+    // arrears, but an overpayment never becomes credit (it is a data-entry
+    // mistake, not a real advance) — so arrears never go below zero.
+    arrears = Math.max(0, balance);
   }
 
   const totalCharged = rows.reduce((sum, row) => sum + row.charge, 0) + num(family.openingArrears);

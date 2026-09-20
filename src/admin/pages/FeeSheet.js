@@ -220,10 +220,8 @@ const FeeSheet = () => {
                       ))}
                     </div>
                   </td>
-                  <td className={`is-num ${row.arrearsIn > 0 ? 'is-due' : row.arrearsIn < 0 ? 'is-clear' : ''}`}>
-                    {row.arrearsIn > 0 && amt(row.arrearsIn)}
-                    {row.arrearsIn < 0 && `Adv ${amt(-row.arrearsIn)}`}
-                    {!row.arrearsIn && '—'}
+                  <td className={`is-num ${row.arrearsIn > 0 ? 'is-due' : ''}`}>
+                    {row.arrearsIn > 0 ? amt(row.arrearsIn) : '—'}
                   </td>
                   <td className="is-num">
                     <NumberCell

@@ -65,12 +65,6 @@ const ChallanCopy = ({ copy, family, row, month, settings }) => (
             <td>{rs(row.arrearsIn)}</td>
           </tr>
         )}
-        {row.arrearsIn < 0 && (
-          <tr className="challan__paid">
-            <td>Less: advance already paid</td>
-            <td>{rs(-row.arrearsIn)}</td>
-          </tr>
-        )}
         {Number(row.record?.fine) > 0 && (
           <tr>
             <td>Fine</td>
