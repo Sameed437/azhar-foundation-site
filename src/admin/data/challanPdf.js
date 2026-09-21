@@ -16,7 +16,7 @@ const MUTED = [95, 99, 104];
 const LINE = [210, 214, 228];
 
 let logoCache; // dataURL, or null when unavailable
-const loadLogo = () => new Promise((resolve) => {
+export const loadLogo = () => new Promise((resolve) => {
   if (logoCache !== undefined) { resolve(logoCache); return; }
   if (typeof document === 'undefined') { logoCache = null; resolve(null); return; }
   try {
@@ -37,7 +37,7 @@ const loadLogo = () => new Promise((resolve) => {
 });
 
 /** The amount lines for one family+month — same logic as the printed challan. */
-const amountLines = (row) => {
+export const amountLines = (row) => {
   const record = row.record || {};
   const monthlyFee = row.charge - (Number(record.misc) || 0) - (Number(record.fine) || 0);
   const lines = [{ label: 'Monthly fee', value: rs(monthlyFee) }];

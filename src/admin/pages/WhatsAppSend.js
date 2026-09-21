@@ -2,10 +2,11 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Icon from '../../components/Icon';
 import { useAdmin } from '../AdminContext';
-import { amt, monthLabel, monthSummary } from '../data/calc';
+import { amt, monthLabel, monthShort, monthSummary } from '../data/calc';
 import { familyHasClass, uniqueClasses } from '../data/classes';
 import { waChallanLink, waPhone } from '../data/whatsapp';
 import { buildChallanPdf, challanPdfName } from '../data/challanPdf';
+import { buildChallanImage } from '../data/challanImage';
 
 /* "Sent" ticks are remembered per month on this device (browser storage),
    so a sending session survives a refresh. They are a checklist aid, not
@@ -167,6 +168,29 @@ const WhatsAppSend = () => {
       }
     } catch (error) {
       if (error && error.name === 'AbortError') return; // user closed the share sheet
+    }
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = name;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+  /** Challan as a picture — shows right inside the WhatsApp chat. */
+  const sharePic = async (family, row) => {
+    const blob = await buildChallanImage(family, row, month, settings);
+    if (!blob) return;
+    const name = `Challan-${monthShort(month)}-Family-${family.id}.png`;
+    try {
+      const file = new File([blob], name, { type: 'image/png' });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: name });
+        markSent(family.id);
+        return;
+      }
+    } catch (error) {
+      if (error && error.name === 'AbortError') return;
     }
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -359,6 +383,14 @@ const WhatsAppSend = () => {
                       title="Challan PDF — on a phone the share sheet opens (choose WhatsApp); on a computer it downloads"
                     >
                       PDF
+                    </button>
+                    <button
+                      type="button"
+                      className="adm-wa__pdf"
+                      onClick={() => sharePic(family, row)}
+                      title="Challan as a picture — parents see it right in the chat; share sheet on a phone, download on a computer"
+                    >
+                      Pic
                     </button>
                     {isSent && (
                       <button
