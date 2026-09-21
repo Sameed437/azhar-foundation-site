@@ -159,6 +159,40 @@ export const AdminProvider = ({ children }) => {
     persist(`record-${familyId}-${month}`, () => driver.saveRecord(familyId, month, record));
   }, [driver, persist]);
 
+  const saveTeacher = useCallback((teacher) => {
+    setData((current) => {
+      const teachers = current.teachers.some((t) => t.id === teacher.id)
+        ? current.teachers.map((t) => (t.id === teacher.id ? teacher : t))
+        : [...current.teachers, teacher];
+      return normalizeSnapshot({ ...current, teachers });
+    });
+    persist(`teacher-${teacher.id}`, () => driver.saveTeacher(teacher));
+  }, [driver, persist]);
+
+  const deleteTeacher = useCallback((teacherId) => {
+    setData((current) => {
+      const salaries = { ...current.salaries };
+      delete salaries[teacherId];
+      return normalizeSnapshot({
+        ...current,
+        teachers: current.teachers.filter((t) => t.id !== teacherId),
+        salaries,
+      });
+    });
+    persist(`teacher-${teacherId}`, () => driver.deleteTeacher(teacherId));
+  }, [driver, persist]);
+
+  const saveSalary = useCallback((teacherId, month, record) => {
+    setData((current) => ({
+      ...current,
+      salaries: {
+        ...current.salaries,
+        [teacherId]: { ...(current.salaries[teacherId] || {}), [month]: record },
+      },
+    }));
+    persist(`salary-${teacherId}-${month}`, () => driver.saveSalary(teacherId, month, record));
+  }, [driver, persist]);
+
   const saveSettings = useCallback((settings) => {
     setData((current) => normalizeSnapshot({ ...current, settings }));
     persist('settings', () => driver.saveSettings(settings));
@@ -202,6 +236,9 @@ export const AdminProvider = ({ children }) => {
     saveFamily,
     deleteFamily,
     saveRecord,
+    saveTeacher,
+    deleteTeacher,
+    saveSalary,
     saveSettings,
     replaceAll,
   };

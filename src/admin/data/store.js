@@ -13,6 +13,10 @@
  *             monthlyFee, openingArrears, notes, activeFrom, activeTo, sort }
  *   records { [familyId]: { [YYYY-MM]: { fee, misc, fine, received,
  *             receivedDate, note } } }
+ *   teacher { id, name, role, phone, cnic, monthlySalary, joinedOn, leftOn,
+ *             notes, sort }
+ *   salaries{ [teacherId]: { [YYYY-MM]: { salary, allowance, deduction, paid,
+ *             paidDate, note } } }
  *   settings{ sessionStart, dueDay, validityDay, finePerDay, schoolName, ... }
  */
 import { localDriver } from './localDriver';
@@ -56,5 +60,20 @@ export const normalizeSnapshot = (snapshot) => ({
     }))
     .sort((a, b) => (a.sort ?? a.id) - (b.sort ?? b.id)),
   records: snapshot?.records || {},
+  teachers: (snapshot?.teachers || [])
+    .map((teacher) => ({
+      role: '',
+      phone: '',
+      cnic: '',
+      monthlySalary: 0,
+      joinedOn: '',
+      leftOn: '',
+      notes: '',
+      ...teacher,
+    }))
+    .sort((a, b) => (a.sort ?? a.id) - (b.sort ?? b.id)),
+  salaries: snapshot?.salaries || {},
+  /** Supabase project without the staff tables yet — the UI offers the SQL. */
+  staffTablesMissing: Boolean(snapshot?.staffTablesMissing),
   settings: { ...DEFAULT_SETTINGS, ...(snapshot?.settings || {}) },
 });

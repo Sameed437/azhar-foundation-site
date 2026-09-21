@@ -1279,6 +1279,13 @@
   color: var(--danger-600);
 }
 
+/* Salary slips exist only for printing — the payroll table is the screen UI */
+.slip-sheets { display: none; }
+
+@media print {
+  .slip-sheets { display: block; }
+}
+
 /* ---------------- challans (screen) ---------------- */
 
 .challan-sheets { display: flex; flex-direction: column; gap: var(--space-5); }

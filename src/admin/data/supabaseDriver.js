@@ -48,6 +48,43 @@ export const createSupabaseDriver = () => {
     sort: family.sort ?? family.id,
   });
 
+  const rowToTeacher = (row) => ({
+    id: row.id,
+    name: row.name,
+    role: row.role || '',
+    phone: row.phone || '',
+    cnic: row.cnic || '',
+    monthlySalary: row.monthly_salary ?? 0,
+    joinedOn: row.joined_on || '',
+    leftOn: row.left_on || '',
+    notes: row.notes || '',
+    sort: row.sort ?? row.id,
+  });
+
+  const teacherToRow = (teacher) => ({
+    id: teacher.id,
+    name: teacher.name,
+    role: teacher.role || null,
+    phone: teacher.phone || null,
+    cnic: teacher.cnic || null,
+    monthly_salary: Number(teacher.monthlySalary) || 0,
+    joined_on: teacher.joinedOn || null,
+    left_on: teacher.leftOn || null,
+    notes: teacher.notes || null,
+    sort: teacher.sort ?? teacher.id,
+  });
+
+  const salaryToRow = (teacherId, month, record) => ({
+    teacher_id: teacherId,
+    month,
+    salary: record.salary === '' || record.salary == null ? null : Number(record.salary),
+    allowance: Number(record.allowance) || 0,
+    deduction: Number(record.deduction) || 0,
+    paid: Number(record.paid) || 0,
+    paid_date: record.paidDate || null,
+    note: record.note || null,
+  });
+
   return {
     mode: 'supabase',
 
@@ -70,14 +107,19 @@ export const createSupabaseDriver = () => {
     },
 
     async fetchAll() {
-      const [familiesRes, recordsRes, settingsRes] = await Promise.all([
+      const [familiesRes, recordsRes, settingsRes, teachersRes, salariesRes] = await Promise.all([
         supabase.from('families').select('*').order('sort'),
         supabase.from('fee_records').select('*'),
         supabase.from('app_settings').select('*').eq('id', 1).maybeSingle(),
+        supabase.from('teachers').select('*').order('sort'),
+        supabase.from('salary_records').select('*'),
       ]);
 
       const firstError = familiesRes.error || recordsRes.error || settingsRes.error;
       if (firstError) throw new Error(firstError.message);
+      // Staff tables are newer: if they aren't created yet, run without them
+      // rather than blocking the whole panel.
+      const staffMissing = teachersRes.error || salariesRes.error;
 
       const records = {};
       for (const row of recordsRes.data || []) {
@@ -93,9 +135,25 @@ export const createSupabaseDriver = () => {
         };
       }
 
+      const salaries = {};
+      for (const row of salariesRes.data || []) {
+        salaries[row.teacher_id] = salaries[row.teacher_id] || {};
+        salaries[row.teacher_id][row.month] = {
+          salary: row.salary ?? '',
+          allowance: row.allowance ?? 0,
+          deduction: row.deduction ?? 0,
+          paid: row.paid ?? 0,
+          paidDate: row.paid_date || '',
+          note: row.note || '',
+        };
+      }
+
       return {
         families: (familiesRes.data || []).map(rowToFamily),
         records,
+        teachers: staffMissing ? [] : (teachersRes.data || []).map(rowToTeacher),
+        salaries: staffMissing ? {} : salaries,
+        staffTablesMissing: Boolean(staffMissing),
         settings: settingsRes.data?.value || {},
       };
     },
@@ -130,6 +188,26 @@ export const createSupabaseDriver = () => {
       if (error) throw new Error(error.message);
     },
 
+    async saveTeacher(teacher) {
+      const { error } = await supabase.from('teachers').upsert(teacherToRow(teacher));
+      if (error) throw new Error(error.message);
+      return teacher;
+    },
+
+    async deleteTeacher(teacherId) {
+      const salaries = await supabase.from('salary_records').delete().eq('teacher_id', teacherId);
+      if (salaries.error) throw new Error(salaries.error.message);
+      const { error } = await supabase.from('teachers').delete().eq('id', teacherId);
+      if (error) throw new Error(error.message);
+    },
+
+    async saveSalary(teacherId, month, record) {
+      const { error } = await supabase
+        .from('salary_records')
+        .upsert(salaryToRow(teacherId, month, record));
+      if (error) throw new Error(error.message);
+    },
+
     async saveSettings(settings) {
       const { error } = await supabase
         .from('app_settings')
@@ -143,6 +221,9 @@ export const createSupabaseDriver = () => {
       if (wipeRecords.error) throw new Error(wipeRecords.error.message);
       const wipeFamilies = await supabase.from('families').delete().gte('id', 0);
       if (wipeFamilies.error) throw new Error(wipeFamilies.error.message);
+      // Staff tables may not exist in older projects — ignore their errors.
+      await supabase.from('salary_records').delete().gte('teacher_id', 0);
+      await supabase.from('teachers').delete().gte('id', 0);
 
       const familyRows = (snapshot.families || []).map(familyToRow);
       if (familyRows.length) {
@@ -170,6 +251,23 @@ export const createSupabaseDriver = () => {
       }
       for (let i = 0; i < recordRows.length; i += 500) {
         const { error } = await supabase.from('fee_records').insert(recordRows.slice(i, i + 500));
+        if (error) throw new Error(error.message);
+      }
+
+      const teacherRows = (snapshot.teachers || []).map(teacherToRow);
+      if (teacherRows.length) {
+        const { error } = await supabase.from('teachers').insert(teacherRows);
+        if (error) throw new Error(`${error.message} (run the staff tables SQL first)`);
+      }
+
+      const salaryRows = [];
+      for (const [teacherId, byMonth] of Object.entries(snapshot.salaries || {})) {
+        for (const [month, record] of Object.entries(byMonth)) {
+          salaryRows.push(salaryToRow(Number(teacherId), month, record));
+        }
+      }
+      for (let i = 0; i < salaryRows.length; i += 500) {
+        const { error } = await supabase.from('salary_records').insert(salaryRows.slice(i, i + 500));
         if (error) throw new Error(error.message);
       }
 

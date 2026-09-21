@@ -97,6 +97,31 @@ export const localDriver = {
     });
   },
 
+  async saveTeacher(teacher) {
+    mutate((data) => {
+      data.teachers = data.teachers || [];
+      const index = data.teachers.findIndex((t) => t.id === teacher.id);
+      if (index >= 0) data.teachers[index] = teacher;
+      else data.teachers.push(teacher);
+    });
+    return teacher;
+  },
+
+  async deleteTeacher(teacherId) {
+    mutate((data) => {
+      data.teachers = (data.teachers || []).filter((t) => t.id !== teacherId);
+      if (data.salaries) delete data.salaries[teacherId];
+    });
+  },
+
+  async saveSalary(teacherId, month, record) {
+    mutate((data) => {
+      data.salaries = data.salaries || {};
+      data.salaries[teacherId] = data.salaries[teacherId] || {};
+      data.salaries[teacherId][month] = record;
+    });
+  },
+
   async saveSettings(settings) {
     mutate((data) => {
       data.settings = settings;

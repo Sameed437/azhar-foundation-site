@@ -46,6 +46,37 @@ create table if not exists public.fee_records (
 -- Existing projects: add the split column without touching data
 alter table public.fee_records add column if not exists received_arrears integer;
 
+-- ---------------------------------------------------------------------------
+-- Staff: teachers and their monthly salaries
+-- ---------------------------------------------------------------------------
+create table if not exists public.teachers (
+  id             integer primary key,
+  name           text not null,
+  role           text,                            -- Teacher, Principal, Ayah…
+  phone          text,
+  cnic           text,
+  monthly_salary integer not null default 0,
+  joined_on      text,                            -- 'YYYY-MM' (blank = always)
+  left_on        text,
+  notes          text,
+  sort           integer,
+  created_at     timestamptz not null default now()
+);
+
+-- One row per teacher per month
+create table if not exists public.salary_records (
+  teacher_id integer not null references public.teachers (id) on delete cascade,
+  month      text not null,                       -- 'YYYY-MM'
+  salary     integer,                             -- null = use monthly_salary
+  allowance  integer not null default 0,          -- bonus / extra duty
+  deduction  integer not null default 0,          -- absences / advance recovery
+  paid       integer not null default 0,
+  paid_date  date,
+  note       text,
+  updated_at timestamptz not null default now(),
+  primary key (teacher_id, month)
+);
+
 -- Single-row app settings (session year, due dates, fine, challan notes)
 create table if not exists public.app_settings (
   id    integer primary key check (id = 1),
@@ -59,6 +90,8 @@ create table if not exists public.app_settings (
 alter table public.families    enable row level security;
 alter table public.fee_records enable row level security;
 alter table public.app_settings enable row level security;
+alter table public.teachers       enable row level security;
+alter table public.salary_records enable row level security;
 
 drop policy if exists "staff full access" on public.families;
 create policy "staff full access" on public.families
@@ -70,4 +103,12 @@ create policy "staff full access" on public.fee_records
 
 drop policy if exists "staff full access" on public.app_settings;
 create policy "staff full access" on public.app_settings
+  for all to authenticated using (true) with check (true);
+
+drop policy if exists "staff full access" on public.teachers;
+create policy "staff full access" on public.teachers
+  for all to authenticated using (true) with check (true);
+
+drop policy if exists "staff full access" on public.salary_records;
+create policy "staff full access" on public.salary_records
   for all to authenticated using (true) with check (true);
