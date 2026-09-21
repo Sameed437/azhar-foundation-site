@@ -1422,12 +1422,17 @@
 
   .challan-page:last-child { page-break-after: auto; }
 
-  /* each copy is exactly one 6.5in form */
+  /* Each copy is one 6.5in form on Legal paper. On any other paper size
+     the copies shrink to half the page instead, so the pair can never
+     spill onto a second sheet. */
   .challan {
     height: 6.5in;
+    max-height: 50vh; /* 1vh = 1% of the printed page's height */
     box-sizing: border-box;
     padding: 0.35in 0.5in;
     overflow: hidden;
+    break-inside: avoid;
+    page-break-inside: avoid;
   }
 
   /* the cut line sits exactly on the 6.5in boundary */
