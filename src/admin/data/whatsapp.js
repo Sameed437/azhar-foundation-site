@@ -45,9 +45,22 @@ export const challanMessage = (family, row, month, settings) => {
   }
   lines.push(
     '',
-    `Due date: ${challanDate(month, settings.dueDay)} (valid till ${challanDate(month, settings.validityDay)})`,
-    'Please pay at the school office. Thank you.'
+    `Due date: ${challanDate(month, settings.dueDay)} (valid till ${challanDate(month, settings.validityDay)})`
   );
+
+  const ways = (settings.paymentDetails || '')
+    .split(String.fromCharCode(10))
+    .map((line) => line.trim())
+    .filter(Boolean);
+  if (ways.length) {
+    lines.push('Please pay at the school office or online:', ...ways);
+  } else {
+    lines.push('Please pay at the school office.');
+  }
+
+  if ((settings.messageNote || '').trim()) {
+    lines.push('', settings.messageNote.trim());
+  }
   return lines.join('\n');
 };
 

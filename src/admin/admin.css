@@ -1042,6 +1042,16 @@
   padding: var(--space-6);
 }
 
+.adm-field textarea {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 0.55rem 0.7rem;
+  font: inherit;
+  font-size: var(--fs-sm);
+  resize: vertical;
+}
+
 .adm-modal__card textarea {
   width: 100%;
   border: 1px solid var(--border);

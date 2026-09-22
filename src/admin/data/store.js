@@ -35,6 +35,13 @@ export const DEFAULT_SETTINGS = {
   schoolSubtitle: 'The Foundation Builders',
   challanNote1: 'Fee & dues once paid are neither refundable nor adjustable in any case.',
   challanNote2: 'After the validity date, a fine of Rs. 100/- per day will be charged.',
+  /* Ways to pay, listed under the amount in the WhatsApp message. One per
+     line; bullets rather than asterisks, which WhatsApp would read as bold. */
+  paymentDetails: [
+    '• JazzCash: 0300-2000282',
+    '• EasyPaisa: 0300-4296150',
+  ].join(String.fromCharCode(10)),
+  messageNote: 'Note: if you have already deposited the fee, please ignore this message.',
 };
 
 let driver = null;

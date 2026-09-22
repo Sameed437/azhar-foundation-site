@@ -200,6 +200,30 @@ const AdminSettings = () => {
 
         <div className="adm-form-grid">
           <label className="adm-field">
+            Ways to pay (WhatsApp message)
+            <textarea
+              rows={4}
+              value={draft.paymentDetails || ''}
+              onChange={(e) => patch({ paymentDetails: e.target.value })}
+              placeholder={['• JazzCash: 0300-2000282', '• EasyPaisa: 0300-4296150', '• Bank: Meezan 1234-5678'].join(String.fromCharCode(10))}
+            />
+            <small>
+              One per line, listed under the amount. Avoid starting a line with * —
+              WhatsApp reads it as bold.
+            </small>
+          </label>
+          <label className="adm-field">
+            Closing note (WhatsApp message)
+            <input
+              type="text"
+              value={draft.messageNote || ''}
+              onChange={(e) => patch({ messageNote: e.target.value })}
+            />
+          </label>
+        </div>
+
+        <div className="adm-form-grid">
+          <label className="adm-field">
             Challan note 1
             <input
               type="text"
