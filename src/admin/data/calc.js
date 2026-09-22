@@ -129,6 +129,20 @@ export const familyLedger = (family, recordsByMonth, months) => {
 };
 
 /**
+ * How a month's payment divides: this month's fee is covered first, and
+ * whatever is left over recovers old arrears. When the office typed the
+ * split by hand on the Fee Sheet, that stored figure wins.
+ */
+export const receivedSplit = (row) => {
+  const record = row?.record || {};
+  const received = num(record.received);
+  const arrears = record.receivedArrears == null || record.receivedArrears === ''
+    ? Math.max(0, received - num(row?.charge))
+    : Math.max(0, num(record.receivedArrears));
+  return { fee: Math.max(0, received - arrears), arrears };
+};
+
+/**
  * Everything the fee sheet and dashboard need for one month, across families.
  */
 export const monthSummary = (families, records, months, month) => {
@@ -149,6 +163,8 @@ export const monthSummary = (families, records, months, month) => {
     expected: total((row) => row.due),
     charged: total((row) => row.charge),
     received: total((row) => row.received),
+    receivedFee: total((row) => receivedSplit(row).fee),
+    receivedArrears: total((row) => receivedSplit(row).arrears),
     outstanding: total((row) => Math.max(0, row.balance)),
     arrearsIn: total((row) => row.arrearsIn),
     paidCount: active.filter(({ row }) => row.status === 'paid').length,

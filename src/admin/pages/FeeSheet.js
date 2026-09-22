@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Icon from '../../components/Icon';
 import { useAdmin } from '../AdminContext';
-import { amt, monthLabel, monthSummary, rs } from '../data/calc';
+import { amt, monthLabel, monthSummary, receivedSplit, rs } from '../data/calc';
 import { familyHasClass, uniqueClasses } from '../data/classes';
 
 const STATUS_LABEL = {
@@ -67,11 +67,8 @@ const FeeSheet = () => {
 
   /** The stored split: what was typed, else fee-part-first from the total. */
   const splitOf = (record, row) => {
-    const received = Number(record.received) || 0;
-    const arr = record.receivedArrears == null || record.receivedArrears === ''
-      ? Math.max(0, received - row.charge)
-      : Math.max(0, Number(record.receivedArrears) || 0);
-    return { fee: Math.max(0, received - arr), arr };
+    const { fee, arrears } = receivedSplit({ ...row, record });
+    return { fee, arr: arrears };
   };
 
   /** Commit one half of the split; the total is always fee part + arrears part. */
@@ -149,16 +146,19 @@ const FeeSheet = () => {
 
       <div className="adm-statrow">
         <div className="adm-stat">
-          <span className="adm-stat__label">Expected (incl. arrears)</span>
+          <span className="adm-stat__label">Expected</span>
           <strong>{rs(summary.expected)}</strong>
+          <small>fee {amt(summary.charged)} + arrears {amt(summary.arrearsIn)}</small>
         </div>
         <div className="adm-stat adm-stat--good">
           <span className="adm-stat__label">Received</span>
           <strong>{rs(summary.received)}</strong>
+          <small>fee {amt(summary.receivedFee)} + arrears {amt(summary.receivedArrears)}</small>
         </div>
         <div className="adm-stat adm-stat--bad">
-          <span className="adm-stat__label">Outstanding</span>
+          <span className="adm-stat__label">Still outstanding</span>
           <strong>{rs(summary.outstanding)}</strong>
+          <small>rolls to next month as arrears</small>
         </div>
         <div className="adm-stat">
           <span className="adm-stat__label">Families</span>

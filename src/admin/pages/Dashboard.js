@@ -3,9 +3,10 @@ import { Link } from 'react-router-dom';
 import Icon from '../../components/Icon';
 import { useAdmin } from '../AdminContext';
 import {
-  MONTH_NAMES,
+  amt,
   monthConcession,
   monthLabel,
+  monthShort,
   monthSummary,
   rs,
 } from '../data/calc';
@@ -107,7 +108,7 @@ const CollectionChart = ({ series }) => {
                   textAnchor="middle"
                   className={`adm-chart__tick${hover === i ? ' is-hover' : ''}`}
                 >
-                  {MONTH_NAMES[i].slice(0, 3)}
+                  {monthShort(s.month).slice(0, 3)}
                 </text>
               </g>
             );
@@ -200,7 +201,9 @@ const Dashboard = () => {
         .filter((m) => m <= currentMonth)
         .map((m) => {
           const s = monthSummary(families, records, months, m);
-          return { month: m, charged: s.charged, received: s.received };
+          // fee charged vs the part of the money that covered that fee —
+          // arrears recovery belongs to the month it came from, not this one
+          return { month: m, charged: s.charged, received: s.receivedFee };
         }),
     [families, records, months, currentMonth]
   );
@@ -253,7 +256,10 @@ const Dashboard = () => {
       <header className="adm-page__head">
         <div>
           <h1>Dashboard</h1>
-          <p>Session at a glance — figures include arrears carried forward.</p>
+          <p>
+            Each figure below is split so you can see what belongs to this
+            month&rsquo;s fee and what belongs to old arrears.
+          </p>
         </div>
         <select value={month} onChange={(e) => setMonth(e.target.value)} aria-label="Month">
           {months.map((m) => <option key={m} value={m}>{monthLabel(m)}</option>)}
@@ -264,17 +270,25 @@ const Dashboard = () => {
         <div className="adm-stat">
           <span className="adm-stat__label">Expected — {monthLabel(month)}</span>
           <strong>{rs(summary.expected)}</strong>
-          <small>{summary.activeCount} active families</small>
+          <small>
+            fee {amt(summary.charged)} + arrears {amt(summary.arrearsIn)} ·{' '}
+            {summary.activeCount} families
+          </small>
         </div>
         <div className="adm-stat adm-stat--good">
           <span className="adm-stat__label">Received</span>
           <strong>{rs(summary.received)}</strong>
-          <small>{summary.expected > 0 ? Math.round((summary.received / summary.expected) * 100) : 0}% of expected</small>
+          <small>
+            fee {amt(summary.receivedFee)} + arrears {amt(summary.receivedArrears)} ·{' '}
+            {summary.expected > 0 ? Math.round((summary.received / summary.expected) * 100) : 0}% of expected
+          </small>
         </div>
         <div className="adm-stat adm-stat--bad">
-          <span className="adm-stat__label">Outstanding</span>
+          <span className="adm-stat__label">Still outstanding</span>
           <strong>{rs(summary.outstanding)}</strong>
-          <small>{summary.partialCount + summary.unpaidCount} families</small>
+          <small>
+            {summary.partialCount + summary.unpaidCount} families · rolls to next month
+          </small>
         </div>
         <div className="adm-stat">
           <span className="adm-stat__label">Concessions given</span>
