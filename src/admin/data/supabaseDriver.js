@@ -188,6 +188,35 @@ export const createSupabaseDriver = () => {
       if (error) throw new Error(error.message);
     },
 
+    /** Bulk edits (maintenance tools) — chunked upserts, not one call each. */
+    async saveFamilies(families) {
+      const rows = families.map(familyToRow);
+      for (let i = 0; i < rows.length; i += 200) {
+        const { error } = await supabase.from('families').upsert(rows.slice(i, i + 200));
+        if (error) throw new Error(error.message);
+      }
+    },
+
+    async saveRecords(entries) {
+      const rows = entries.map(({ familyId, month, record }) => ({
+        family_id: familyId,
+        month,
+        fee: record.fee === '' || record.fee == null ? null : Number(record.fee),
+        misc: Number(record.misc) || 0,
+        fine: Number(record.fine) || 0,
+        received: Number(record.received) || 0,
+        received_arrears: record.receivedArrears == null || record.receivedArrears === ''
+          ? null
+          : Number(record.receivedArrears) || 0,
+        received_date: record.receivedDate || null,
+        note: record.note || null,
+      }));
+      for (let i = 0; i < rows.length; i += 200) {
+        const { error } = await supabase.from('fee_records').upsert(rows.slice(i, i + 200));
+        if (error) throw new Error(error.message);
+      }
+    },
+
     async saveTeacher(teacher) {
       const { error } = await supabase.from('teachers').upsert(teacherToRow(teacher));
       if (error) throw new Error(error.message);

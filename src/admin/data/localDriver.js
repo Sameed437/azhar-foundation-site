@@ -97,6 +97,28 @@ export const localDriver = {
     });
   },
 
+  /** Bulk edits (maintenance tools) — one pass over the document. */
+  async saveFamilies(families) {
+    mutate((data) => {
+      data.families = data.families || [];
+      for (const family of families) {
+        const index = data.families.findIndex((f) => f.id === family.id);
+        if (index >= 0) data.families[index] = family;
+        else data.families.push(family);
+      }
+    });
+  },
+
+  async saveRecords(entries) {
+    mutate((data) => {
+      data.records = data.records || {};
+      for (const { familyId, month, record } of entries) {
+        data.records[familyId] = data.records[familyId] || {};
+        data.records[familyId][month] = record;
+      }
+    });
+  },
+
   async saveTeacher(teacher) {
     mutate((data) => {
       data.teachers = data.teachers || [];

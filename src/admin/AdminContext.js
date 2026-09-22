@@ -159,6 +159,29 @@ export const AdminProvider = ({ children }) => {
     persist(`record-${familyId}-${month}`, () => driver.saveRecord(familyId, month, record));
   }, [driver, persist]);
 
+  /**
+   * One maintenance edit touching many families/months: the screen updates
+   * once and the drivers write in chunks, instead of hundreds of saves.
+   */
+  const applyBulk = useCallback(({ families = [], records = [] }) => {
+    setData((current) => {
+      const byId = new Map(families.map((f) => [f.id, f]));
+      const nextRecords = { ...current.records };
+      for (const { familyId, month, record } of records) {
+        nextRecords[familyId] = { ...(nextRecords[familyId] || {}), [month]: record };
+      }
+      return normalizeSnapshot({
+        ...current,
+        families: byId.size
+          ? current.families.map((f) => byId.get(f.id) || f)
+          : current.families,
+        records: nextRecords,
+      });
+    });
+    if (families.length) persist('bulk-families', () => driver.saveFamilies(families));
+    if (records.length) persist('bulk-records', () => driver.saveRecords(records));
+  }, [driver, persist]);
+
   const saveTeacher = useCallback((teacher) => {
     setData((current) => {
       const teachers = current.teachers.some((t) => t.id === teacher.id)
@@ -236,6 +259,7 @@ export const AdminProvider = ({ children }) => {
     saveFamily,
     deleteFamily,
     saveRecord,
+    applyBulk,
     saveTeacher,
     deleteTeacher,
     saveSalary,

@@ -1,14 +1,14 @@
-import React, { useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Icon from '../../components/Icon';
 import { useAdmin } from '../AdminContext';
-import { MONTH_NAMES, sessionLabel } from '../data/calc';
+import { MONTH_NAMES, amt, monthLabel, sessionLabel } from '../data/calc';
 
 /** ID far above the real register (1-83), so the practice entry is unmistakable. */
 const TEST_FAMILY_ID = 999;
 
 const AdminSettings = () => {
-  const { data, mode, saveSettings, replaceAll, saveFamily } = useAdmin();
+  const { data, mode, months, saveSettings, replaceAll, saveFamily, applyBulk } = useAdmin();
   const [draft, setDraft] = useState(data.settings);
   const [status, setStatus] = useState('');
   const fileRef = useRef(null);
@@ -54,6 +54,75 @@ const AdminSettings = () => {
     } catch (error) {
       setStatus(`Restore failed: ${error.message}`);
     }
+  };
+
+  /**
+   * The Excel import wrote a fee into every future month, so later months
+   * can disagree with the month the office actually verified. This lines
+   * them all up: the starting month's fee becomes the family's monthly fee
+   * and the stored per-month fees are cleared, so every month follows it.
+   */
+  const align = useMemo(() => {
+    const refMonth = months[0];
+    const familyUpdates = [];
+    const recordUpdates = [];
+    const examples = [];
+    let differing = 0;
+    let skipped = 0;
+
+    for (const family of data.families) {
+      const byMonth = data.records[family.id] || {};
+      const refRecord = byMonth[refMonth];
+      const refFee = refRecord && refRecord.fee !== '' && refRecord.fee != null
+        ? Number(refRecord.fee)
+        : Number(family.monthlyFee) || 0;
+
+      const stored = months
+        .map((month) => ({ month, record: byMonth[month] }))
+        .filter(({ record }) => record && record.fee !== '' && record.fee != null);
+
+      // A zero reference with real fees later is missing data, not a free
+      // student — leave that family untouched and report it.
+      if (refFee === 0 && stored.some(({ record }) => Number(record.fee) > 0)) {
+        skipped += 1;
+        continue;
+      }
+
+      let familyDiffers = false;
+      for (const { month, record } of stored) {
+        if (Number(record.fee) !== refFee) familyDiffers = true;
+        recordUpdates.push({ familyId: family.id, month, record: { ...record, fee: '' } });
+      }
+      if (Number(family.monthlyFee) !== refFee) {
+        familyUpdates.push({ ...family, monthlyFee: refFee });
+        familyDiffers = true;
+      }
+      if (familyDiffers) {
+        differing += 1;
+        if (examples.length < 3) {
+          const other = stored.find(({ record }) => Number(record.fee) !== refFee);
+          if (other) {
+            examples.push(`#${family.id} ${family.name}: ${amt(other.record.fee)} in ${monthLabel(other.month)} → ${amt(refFee)}`);
+          }
+        }
+      }
+    }
+    return { refMonth, familyUpdates, recordUpdates, differing, skipped, examples };
+  }, [data.families, data.records, months]);
+
+  const runAlign = () => {
+    const lines = [
+      `Make every month use the same fee as ${monthLabel(align.refMonth)}?`,
+      '',
+      `${align.differing} families will change, for example:`,
+      ...align.examples,
+      '',
+      'Payments, dates and other charges are not touched.',
+    ];
+    // eslint-disable-next-line no-alert
+    if (!window.confirm(lines.join(String.fromCharCode(10)))) return;
+    applyBulk({ families: align.familyUpdates, records: align.recordUpdates });
+    setStatus(`${align.differing} families now follow their ${monthLabel(align.refMonth)} fee.`);
   };
 
   return (
@@ -153,6 +222,41 @@ const AdminSettings = () => {
           <button type="submit" className="btn btn--primary">Save settings</button>
         </div>
       </form>
+
+      <section className="adm-panel">
+        <h2>Fix fees that differ between months</h2>
+        <p className="adm-help">
+          The old Excel import wrote a separate fee into every future month, so a
+          family can show one fee in {monthLabel(align.refMonth)} and a different one in
+          later months. This makes <strong>{monthLabel(align.refMonth)} the truth</strong>:
+          its fee becomes the family&rsquo;s monthly fee and the stored month-by-month
+          fees are cleared, so every month follows it — and changing a family&rsquo;s fee
+          later updates all its months. Payments, dates, misc charges and arrears are
+          untouched. Download a backup first if you want a safety net.
+        </p>
+        {align.differing > 0 ? (
+          <>
+            <ul className="adm-steps">
+              {align.examples.map((line) => <li key={line}>{line}</li>)}
+            </ul>
+            <button type="button" className="btn btn--primary" onClick={runAlign}>
+              <Icon name="check" size={16} />
+              Line up {align.differing} famil{align.differing === 1 ? 'y' : 'ies'} with {monthLabel(align.refMonth)}
+            </button>
+          </>
+        ) : (
+          <p className="adm-help adm-help--ok">
+            Every family already charges the same fee in every month. Nothing to fix.
+          </p>
+        )}
+        {align.skipped > 0 && (
+          <p className="adm-help">
+            {align.skipped} famil{align.skipped === 1 ? 'y has' : 'ies have'} no fee set for{' '}
+            {monthLabel(align.refMonth)} but a fee in later months — those were left alone.
+            Open them on Students &amp; Families and set the correct monthly fee.
+          </p>
+        )}
+      </section>
 
       <section className="adm-panel">
         <h2>Backup &amp; restore</h2>
