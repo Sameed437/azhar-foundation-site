@@ -24,6 +24,10 @@ import { createSupabaseDriver, supabaseConfigured } from './supabaseDriver';
 
 export const DEFAULT_SETTINGS = {
   sessionStart: 2026,
+  /* The month the portal's records begin (1-12). The school moved off
+     paper in September, so earlier months are not charged or shown —
+     whatever was owed before is entered as each family's opening arrears. */
+  startMonth: 9,
   dueDay: 5,
   validityDay: 10,
   finePerDay: 100,

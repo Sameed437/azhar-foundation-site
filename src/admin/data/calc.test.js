@@ -99,3 +99,28 @@ describe('monthSummary', () => {
     expect(summary.partialCount).toBe(1);
   });
 });
+
+describe('sessionMonths with a later start month', () => {
+  test('September start gives Sep → Feb only', () => {
+    const months = sessionMonths(2026, 9);
+    expect(months).toEqual([
+      '2026-09', '2026-10', '2026-11', '2026-12', '2027-01', '2027-02',
+    ]);
+  });
+
+  test('March (or no value) keeps the whole session', () => {
+    expect(sessionMonths(2026, 3)).toHaveLength(12);
+    expect(sessionMonths(2026)).toHaveLength(12);
+  });
+
+  test('the first month carries only the opening arrears', () => {
+    const months = sessionMonths(2026, 9);
+    const family = { id: 1, monthlyFee: 3000, openingArrears: 5000 };
+    // records from before the start month must be ignored entirely
+    const records = { '2026-04': { received: 3000 }, '2026-08': { received: 0 } };
+    const { rows } = familyLedger(family, records, months);
+    expect(rows[0].month).toBe('2026-09');
+    expect(rows[0].arrearsIn).toBe(5000);
+    expect(rows[0].due).toBe(8000);
+  });
+});

@@ -13,10 +13,14 @@ export const MONTH_NAMES = [
 ];
 
 /**
- * The twelve "YYYY-MM" keys of a session.
+ * The "YYYY-MM" keys of a session, March → February.
  * sessionStart 2026 → 2026-03 … 2027-02, displayed as "2026–27".
+ *
+ * startMonth (1-12) trims the earlier months away: a school that begins
+ * keeping records in September passes 9 and gets 2026-09 … 2027-02, so
+ * nothing before that month is charged, shown or carried as arrears.
  */
-export const sessionMonths = (sessionStart) => {
+export const sessionMonths = (sessionStart, startMonth) => {
   const months = [];
   for (let i = 0; i < 12; i += 1) {
     const monthIndex = 2 + i; // March = index 2
@@ -24,7 +28,9 @@ export const sessionMonths = (sessionStart) => {
     const month = (monthIndex % 12) + 1;
     months.push(`${year}-${String(month).padStart(2, '0')}`);
   }
-  return months;
+  if (!startMonth) return months;
+  const from = months.findIndex((key) => Number(key.split('-')[1]) === Number(startMonth));
+  return from > 0 ? months.slice(from) : months;
 };
 
 export const sessionLabel = (sessionStart) =>

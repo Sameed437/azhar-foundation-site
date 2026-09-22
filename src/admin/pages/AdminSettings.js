@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Icon from '../../components/Icon';
 import { useAdmin } from '../AdminContext';
-import { sessionLabel } from '../data/calc';
+import { MONTH_NAMES, sessionLabel } from '../data/calc';
 
 /** ID far above the real register (1-83), so the practice entry is unmistakable. */
 const TEST_FAMILY_ID = 999;
@@ -20,6 +20,7 @@ const AdminSettings = () => {
     saveSettings({
       ...draft,
       sessionStart: Number(draft.sessionStart) || 2026,
+      startMonth: Number(draft.startMonth) || 3,
       dueDay: Number(draft.dueDay) || 5,
       validityDay: Number(draft.validityDay) || 10,
       finePerDay: Number(draft.finePerDay) || 0,
@@ -76,6 +77,20 @@ const AdminSettings = () => {
               onChange={(e) => patch({ sessionStart: e.target.value })}
             />
             <small>Session {sessionLabel(Number(draft.sessionStart) || 2026)} — March to February</small>
+          </label>
+          <label className="adm-field adm-field--sm">
+            Records begin from
+            <select
+              value={draft.startMonth || 3}
+              onChange={(e) => patch({ startMonth: e.target.value })}
+            >
+              {[3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 1, 2].map((m) => (
+                <option key={m} value={m}>
+                  {MONTH_NAMES[(m + 9) % 12]}{m === 3 ? ' (whole session)' : ''}
+                </option>
+              ))}
+            </select>
+            <small>Months before this are not charged, shown or counted anywhere.</small>
           </label>
           <label className="adm-field adm-field--sm">
             Due day of month

@@ -204,8 +204,8 @@ export const AdminProvider = ({ children }) => {
   }, [driver, refresh]);
 
   const months = useMemo(
-    () => sessionMonths(data.settings.sessionStart),
-    [data.settings.sessionStart]
+    () => sessionMonths(data.settings.sessionStart, data.settings.startMonth),
+    [data.settings.sessionStart, data.settings.startMonth]
   );
 
   /** Default working month: today if inside the session, else its first month. */
