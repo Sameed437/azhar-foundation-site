@@ -73,6 +73,16 @@ const SaveState = () => {
 
 const Shell = () => {
   const { user, booting, data, mode, signOut, saveError, clearSaveError, failedCount, retryFailed } = useAdmin();
+  /* Phones get a hamburger: the nav is hidden until it is opened, and
+     closes again as soon as a page is chosen. */
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+    if (!menuOpen) return undefined;
+    const onKey = (event) => { if (event.key === 'Escape') setMenuOpen(false); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [menuOpen]);
 
   if (booting) {
     return (
@@ -87,21 +97,32 @@ const Shell = () => {
 
   return (
     <div className="adm">
-      <aside className="adm-side">
+      <aside className={`adm-side${menuOpen ? ' is-open' : ''}`}>
         <div className="adm-side__brand">
           <img src="/images/logo.png" alt="" width="40" height="40" />
           <div>
             <strong>A.F.S Fee System</strong>
             <span>Session {sessionLabel(data.settings.sessionStart)}</span>
           </div>
+          <button
+            type="button"
+            className="adm-side__burger"
+            onClick={() => setMenuOpen((open) => !open)}
+            aria-expanded={menuOpen}
+            aria-controls="adm-nav"
+            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+          >
+            <Icon name={menuOpen ? 'close' : 'menu'} size={22} />
+          </button>
         </div>
 
-        <nav className="adm-side__nav" aria-label="Admin">
+        <nav className="adm-side__nav" id="adm-nav" aria-label="Admin">
           {NAV.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
               end={item.end}
+              onClick={() => setMenuOpen(false)}
               className={({ isActive }) => `adm-side__link${isActive ? ' is-active' : ''}`}
             >
               <Icon name={item.icon} size={19} />

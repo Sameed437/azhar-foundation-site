@@ -140,6 +140,18 @@
 
 .adm-side__logout:hover { background: rgba(255, 255, 255, 0.08); color: #fff; }
 
+/* the hamburger only exists on small screens */
+.adm-side__burger {
+  display: none;
+  border: 1px solid var(--border-on-dark);
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  border-radius: var(--r-sm);
+  padding: 0.35rem;
+  cursor: pointer;
+  place-items: center;
+}
+
 /* ---------------- main column ---------------- */
 
 .adm-main {
@@ -1488,26 +1500,46 @@
     border: none;
     padding: 0;
     margin: 0;
-    margin-right: auto;
+    width: 100%;
+    gap: 0.6rem;
   }
+
+  .adm-side__burger { display: inline-grid; margin-left: auto; }
+
+  /* closed by default on phones — the crest, the session and the burger */
+  .adm-side__nav,
+  .adm-side__foot { display: none; }
+
+  .adm-side.is-open .adm-side__nav { display: flex; }
+  .adm-side.is-open .adm-side__foot { display: flex; }
 
   .adm-side__nav {
     order: 3;
     width: 100%;
     min-width: 0;
-    flex-direction: row;
-    overflow-x: auto;
-    gap: 0.3rem;
+    /* opened menu: a readable list, not a cramped scrolling row */
+    flex-direction: column;
+    gap: 0.15rem;
+    max-height: 70vh;
+    max-height: 70dvh;
+    overflow-y: auto;
+    padding-top: var(--space-3);
+    margin-top: var(--space-3);
+    border-top: 1px solid var(--border-on-dark);
   }
 
   .adm-side__link { white-space: nowrap; padding: 0.5rem 0.7rem; }
 
   .adm-side__foot {
+    order: 4;
+    width: 100%;
     margin: 0;
-    padding: 0;
-    border: none;
+    padding-top: var(--space-3);
+    margin-top: var(--space-3);
+    border-top: 1px solid var(--border-on-dark);
     flex-direction: row;
     align-items: center;
+    justify-content: space-between;
     gap: var(--space-4);
   }
 
@@ -1528,16 +1560,11 @@
 @media (max-width: 900px) {
   .adm-side__brand strong { font-size: var(--fs-xs); }
 
-  .adm-side__nav {
-    scrollbar-width: none;
-    -webkit-overflow-scrolling: touch;
-    /* right-edge fade hints that the row scrolls */
-    -webkit-mask-image: linear-gradient(to right, #000 92%, transparent);
-    mask-image: linear-gradient(to right, #000 92%, transparent);
-    padding-right: var(--space-4);
-  }
+  .adm-side__nav { scrollbar-width: none; -webkit-overflow-scrolling: touch; }
 
   .adm-side__nav::-webkit-scrollbar { display: none; }
+
+  .adm-side__link { padding: 0.7rem 0.8rem; }
 
   /* email can be long - the sign-out action matters more */
   .adm-side__user > span { max-width: 130px; }
