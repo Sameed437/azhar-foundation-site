@@ -2,14 +2,12 @@ import { jsPDF } from 'jspdf';
 import { monthLabel, monthShort, rs } from './calc';
 import { challanDate } from './whatsapp';
 
-/* Legal paper turned landscape (14in × 8.5in) in points. Each challan form
-   is an upright 6.5in × 8.5in slip and two sit side by side, so one straight
-   vertical cut separates them. */
-const PAGE_W = 1008; // 14in
-const PAGE_H = 612;  // 8.5in
-const HALF = PAGE_W / 2; // where the cut falls
-const PAD_TOP = 34;
-const MARGIN = 32;
+/* The school's challan paper: 6.5in x 8.5in portrait, one challan per
+   sheet, so nothing has to be cut. */
+const PAGE_W = 468; // 6.5in
+const PAGE_H = 612; // 8.5in
+const PAD_TOP = 30;
+const MARGIN = 28;
 const NAVY = [26, 35, 126];
 const GREEN = [19, 115, 51];
 const INK = [32, 33, 36];
@@ -62,9 +60,9 @@ export const amountLines = (row) => {
 };
 
 /** Draw one copy (student or office) starting at y; returns the y after it. */
-const drawCopy = (doc, colX, copyLabel, family, row, month, settings, logo) => {
-  const left = colX + MARGIN;
-  const right = colX + HALF - MARGIN;
+const drawCopy = (doc, copyLabel, family, row, month, settings, logo) => {
+  const left = MARGIN;
+  const right = PAGE_W - MARGIN;
   let y = PAD_TOP;
 
   /* header */
@@ -99,11 +97,11 @@ const drawCopy = (doc, colX, copyLabel, family, row, month, settings, logo) => {
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(...MUTED);
     doc.text(cells[0], left, y);
-    doc.text(cells[2], left + 190, y);
+    doc.text(cells[2], left + 200, y);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(...INK);
     doc.text(cells[1], left + 62, y);
-    doc.text(cells[3], left + 190 + 58, y);
+    doc.text(cells[3], left + 200 + 58, y);
     y += 14;
   });
   doc.setFont('helvetica', 'bold');
@@ -161,14 +159,6 @@ const drawCopy = (doc, colX, copyLabel, family, row, month, settings, logo) => {
   return y + 10;
 };
 
-/** Dashed cut line running down the middle of the sheet. */
-const drawCutLine = (doc) => {
-  doc.setDrawColor(...MUTED);
-  for (let y = 18; y < PAGE_H - 18; y += 9) {
-    doc.line(HALF, y, HALF, y + 4);
-  }
-};
-
 /**
  * Build one PDF with a Legal page (8.5in × 14in) per family: the Student
  * Copy fills the top 6.5in, the cut line sits exactly at 6.5in, and the
@@ -178,13 +168,14 @@ const drawCutLine = (doc) => {
  */
 export const buildChallanPdf = async (items, month, settings) => {
   const logo = await loadLogo();
-  const doc = new jsPDF({ unit: 'pt', format: 'legal', orientation: 'landscape' });
+  const size = [PAGE_W, PAGE_H];
+  const doc = new jsPDF({ unit: 'pt', format: size, orientation: 'portrait' });
 
   items.forEach(({ family, row }, index) => {
-    if (index > 0) doc.addPage('legal', 'landscape');
-    drawCopy(doc, 0, 'Student Copy', family, row, month, settings, logo);
-    drawCutLine(doc);
-    drawCopy(doc, HALF, 'Office Copy', family, row, month, settings, logo);
+    if (index > 0) doc.addPage(size, 'portrait');
+    drawCopy(doc, 'Student Copy', family, row, month, settings, logo);
+    doc.addPage(size, 'portrait');
+    drawCopy(doc, 'Office Copy', family, row, month, settings, logo);
   });
 
   return doc;

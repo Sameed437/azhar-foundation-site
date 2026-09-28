@@ -208,9 +208,15 @@ const WhatsAppSend = () => {
     await deliver(blob, `Challan-${monthShort(month)}-Family-${family.id}.png`, family);
   };
 
-  /** Button handlers: on a computer the chat is opened first, then the file. */
+  /**
+   * PDF / Pic: always open the parent's chat first — on every device — so the
+   * right conversation is on screen. The file then follows: the share sheet
+   * attaches it where that is allowed (and WhatsApp now lists this parent
+   * first, since their chat was just opened), otherwise it downloads and can
+   * be attached from inside the chat.
+   */
   const onSendFile = (kind, family, row) => {
-    if (!canShareFiles) openChat(family, row);
+    openChat(family, row);
     if (kind === 'pdf') sharePdf([{ family, row }]);
     else sharePic(family, row);
   };
@@ -396,7 +402,7 @@ const WhatsAppSend = () => {
                       type="button"
                       className="adm-wa__pdf"
                       onClick={() => onSendFile('pdf', family, row)}
-                      title="Challan PDF — on a phone the share sheet opens (choose WhatsApp → this parent); on a computer their chat opens and the file downloads, ready to drag in"
+                      title="Opens this parent's chat, then hands over the challan PDF — attach it from the share sheet or from the chat"
                     >
                       PDF
                     </button>
@@ -404,7 +410,7 @@ const WhatsAppSend = () => {
                       type="button"
                       className="adm-wa__pdf"
                       onClick={() => onSendFile('pic', family, row)}
-                      title="Challan picture — parents see it right in the chat; share sheet on a phone, chat + download on a computer"
+                      title="Opens this parent's chat, then hands over the challan picture — parents see it right in the chat"
                     >
                       Pic
                     </button>
