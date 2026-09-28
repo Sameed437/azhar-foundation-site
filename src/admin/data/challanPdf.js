@@ -2,13 +2,14 @@ import { jsPDF } from 'jspdf';
 import { monthLabel, monthShort, rs } from './calc';
 import { challanDate } from './whatsapp';
 
-/* Legal paper (8.5in × 14in) in points. Each challan form is exactly
-   8.5in × 6.5in — two per sheet with the cut at the 6.5in mark, matching
-   the school's half-inserted legal paper workflow. */
-const PAGE_W = 612; // 8.5in
-const FORM_H = 468; // 6.5in per challan form
-const PAD_TOP = 30; // breathing room inside each form
-const MARGIN = 36;
+/* Legal paper turned landscape (14in × 8.5in) in points. Each challan form
+   is an upright 6.5in × 8.5in slip and two sit side by side, so one straight
+   vertical cut separates them. */
+const PAGE_W = 1008; // 14in
+const PAGE_H = 612;  // 8.5in
+const HALF = PAGE_W / 2; // where the cut falls
+const PAD_TOP = 34;
+const MARGIN = 32;
 const NAVY = [26, 35, 126];
 const GREEN = [19, 115, 51];
 const INK = [32, 33, 36];
@@ -61,10 +62,10 @@ export const amountLines = (row) => {
 };
 
 /** Draw one copy (student or office) starting at y; returns the y after it. */
-const drawCopy = (doc, top, copyLabel, family, row, month, settings, logo) => {
-  const left = MARGIN;
-  const right = PAGE_W - MARGIN;
-  let y = top;
+const drawCopy = (doc, colX, copyLabel, family, row, month, settings, logo) => {
+  const left = colX + MARGIN;
+  const right = colX + HALF - MARGIN;
+  let y = PAD_TOP;
 
   /* header */
   if (logo) doc.addImage(logo, 'PNG', left, y, 34, 34);
@@ -98,11 +99,11 @@ const drawCopy = (doc, top, copyLabel, family, row, month, settings, logo) => {
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(...MUTED);
     doc.text(cells[0], left, y);
-    doc.text(cells[2], left + 280, y);
+    doc.text(cells[2], left + 190, y);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(...INK);
-    doc.text(cells[1], left + 70, y);
-    doc.text(cells[3], left + 280 + 70, y);
+    doc.text(cells[1], left + 62, y);
+    doc.text(cells[3], left + 190 + 58, y);
     y += 14;
   });
   doc.setFont('helvetica', 'bold');
@@ -110,8 +111,8 @@ const drawCopy = (doc, top, copyLabel, family, row, month, settings, logo) => {
   doc.text('Student(s)', left, y);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(...INK);
-  const nameLines = doc.splitTextToSize(names, right - left - 70);
-  doc.text(nameLines, left + 70, y);
+  const nameLines = doc.splitTextToSize(names, right - left - 62);
+  doc.text(nameLines, left + 62, y);
   y += nameLines.length * 12 + 8;
 
   /* amounts */
@@ -160,15 +161,12 @@ const drawCopy = (doc, top, copyLabel, family, row, month, settings, logo) => {
   return y + 10;
 };
 
-/** Dashed cut line between the two copies. */
-const drawCutLine = (doc, y) => {
+/** Dashed cut line running down the middle of the sheet. */
+const drawCutLine = (doc) => {
   doc.setDrawColor(...MUTED);
-  for (let x = MARGIN; x < PAGE_W - MARGIN; x += 9) {
-    doc.line(x, y, x + 4, y);
+  for (let y = 18; y < PAGE_H - 18; y += 9) {
+    doc.line(HALF, y, HALF, y + 4);
   }
-  doc.setFontSize(7);
-  doc.setTextColor(...MUTED);
-  doc.text('cut here', PAGE_W / 2, y - 3, { align: 'center' });
 };
 
 /**
@@ -180,13 +178,13 @@ const drawCutLine = (doc, y) => {
  */
 export const buildChallanPdf = async (items, month, settings) => {
   const logo = await loadLogo();
-  const doc = new jsPDF({ unit: 'pt', format: 'legal' });
+  const doc = new jsPDF({ unit: 'pt', format: 'legal', orientation: 'landscape' });
 
   items.forEach(({ family, row }, index) => {
-    if (index > 0) doc.addPage();
-    drawCopy(doc, PAD_TOP, 'Student Copy', family, row, month, settings, logo);
-    drawCutLine(doc, FORM_H);
-    drawCopy(doc, FORM_H + PAD_TOP, 'Office Copy', family, row, month, settings, logo);
+    if (index > 0) doc.addPage('legal', 'landscape');
+    drawCopy(doc, 0, 'Student Copy', family, row, month, settings, logo);
+    drawCutLine(doc);
+    drawCopy(doc, HALF, 'Office Copy', family, row, month, settings, logo);
   });
 
   return doc;

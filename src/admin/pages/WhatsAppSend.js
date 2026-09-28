@@ -152,55 +152,69 @@ const WhatsAppSend = () => {
   };
 
   /**
-   * Challan PDF: on phones the share sheet opens (pick WhatsApp → contact →
-   * the PDF attaches itself); on computers it downloads, ready to drag into
-   * WhatsApp Web. WhatsApp does not allow a link to attach files directly.
+   * Hand a generated file to WhatsApp.
+   *
+   * Phones: the share sheet opens and WhatsApp asks which chat — no link can
+   * attach a file to a chosen chat, that is WhatsApp's own rule.
+   * Computers: the file downloads AND that family's chat is opened first, so
+   * it can be dragged straight in. The chat is opened before any await so the
+   * browser still counts it as the button press and never blocks the tab.
    */
-  const sharePdf = async (items) => {
-    if (!items.length) return;
-    const doc = await buildChallanPdf(items, month, settings);
-    const name = challanPdfName(items, month);
-    const blob = doc.output('blob');
+  const canShareFiles = typeof navigator !== 'undefined'
+    && typeof navigator.share === 'function'
+    && typeof navigator.canShare === 'function';
+
+  const openChat = (family, row) => {
+    const link = waChallanLink(family, row, month, settings);
+    if (!link) return;
+    window.open(link, '_blank', 'noopener');
+    markSent(family.id);
+  };
+
+  const deliver = async (blob, fileName, family) => {
+    if (!blob) return;
     try {
-      const file = new File([blob], name, { type: 'application/pdf' });
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({ files: [file], title: name });
-        items.forEach(({ family }) => markSent(family.id));
+      const file = new File([blob], fileName, { type: blob.type });
+      if (canShareFiles && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: family ? `${family.name} — ${monthLabel(month)}` : fileName,
+        });
+        if (family) markSent(family.id);
         return;
       }
     } catch (error) {
-      if (error && error.name === 'AbortError') return; // user closed the share sheet
+      if (error && error.name === 'AbortError') return; // share sheet dismissed
     }
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = name;
+    link.download = fileName;
     link.click();
     URL.revokeObjectURL(url);
+  };
+
+  /** Challan PDF — one family, or every selected family in one file. */
+  const sharePdf = async (items) => {
+    if (!items.length) return;
+    const doc = await buildChallanPdf(items, month, settings);
+    await deliver(doc.output('blob'), challanPdfName(items, month),
+      items.length === 1 ? items[0].family : null);
   };
 
   /** Challan as a picture — shows right inside the WhatsApp chat. */
   const sharePic = async (family, row) => {
     const blob = await buildChallanImage(family, row, month, settings);
-    if (!blob) return;
-    const name = `Challan-${monthShort(month)}-Family-${family.id}.png`;
-    try {
-      const file = new File([blob], name, { type: 'image/png' });
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({ files: [file], title: name });
-        markSent(family.id);
-        return;
-      }
-    } catch (error) {
-      if (error && error.name === 'AbortError') return;
-    }
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = name;
-    link.click();
-    URL.revokeObjectURL(url);
+    await deliver(blob, `Challan-${monthShort(month)}-Family-${family.id}.png`, family);
   };
+
+  /** Button handlers: on a computer the chat is opened first, then the file. */
+  const onSendFile = (kind, family, row) => {
+    if (!canShareFiles) openChat(family, row);
+    if (kind === 'pdf') sharePdf([{ family, row }]);
+    else sharePic(family, row);
+  };
+
 
   return (
     <div className="adm-page">
@@ -381,16 +395,16 @@ const WhatsAppSend = () => {
                     <button
                       type="button"
                       className="adm-wa__pdf"
-                      onClick={() => sharePdf([{ family, row }])}
-                      title="Challan PDF — on a phone the share sheet opens (choose WhatsApp); on a computer it downloads"
+                      onClick={() => onSendFile('pdf', family, row)}
+                      title="Challan PDF — on a phone the share sheet opens (choose WhatsApp → this parent); on a computer their chat opens and the file downloads, ready to drag in"
                     >
                       PDF
                     </button>
                     <button
                       type="button"
                       className="adm-wa__pdf"
-                      onClick={() => sharePic(family, row)}
-                      title="Challan as a picture — parents see it right in the chat; share sheet on a phone, download on a computer"
+                      onClick={() => onSendFile('pic', family, row)}
+                      title="Challan picture — parents see it right in the chat; share sheet on a phone, chat + download on a computer"
                     >
                       Pic
                     </button>

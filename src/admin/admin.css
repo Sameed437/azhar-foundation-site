@@ -1305,173 +1305,82 @@
 .slip-sheets { display: none; }
 
 @media print {
-  .slip-sheets { display: block; }
-}
+  /* Legal paper turned landscape: two upright 6.5in x 8.5in challan forms
+     side by side, one straight vertical cut between them.
+     Choose Legal + Landscape + 100% scale in the print dialog. */
+  @page { size: 14in 8.5in; margin: 0; }
 
-/* ---------------- challans (screen) ---------------- */
-
-.challan-sheets { display: flex; flex-direction: column; gap: var(--space-5); }
-
-.challan-page {
-  background: var(--white);
-  border: 1px solid var(--border-soft);
-  border-radius: var(--r-md);
-  box-shadow: var(--shadow-sm);
-  padding: 10mm;
-  max-width: 210mm;
-}
-
-.challan { font-size: 12px; color: #14171f; }
-
-.challan__head {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  border-bottom: 2px solid #1a237e;
-  padding-bottom: 6px;
-  margin-bottom: 8px;
-}
-
-.challan__head img { width: 42px; height: 42px; }
-
-.challan__head h2 {
-  font-size: 15px;
-  color: #1a237e;
-  letter-spacing: 0;
-}
-
-.challan__head p { font-size: 11px; color: #444; }
-
-.challan__copy {
-  margin-left: auto;
-  font-family: var(--font-display);
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  border: 1px solid #1a237e;
-  color: #1a237e;
-  border-radius: 999px;
-  padding: 3px 10px;
-  white-space: nowrap;
-}
-
-.challan__meta,
-.challan__amounts {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 8px;
-}
-
-.challan__meta th,
-.challan__meta td,
-.challan__amounts td {
-  border: 1px solid #c8cdd8;
-  padding: 4px 8px;
-  text-align: left;
-}
-
-.challan__meta th {
-  width: 90px;
-  background: #eef0fa;
-  font-family: var(--font-display);
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: #1a237e;
-  white-space: nowrap;
-}
-
-.challan__amounts td:last-child {
-  text-align: right;
-  width: 110px;
-  font-variant-numeric: tabular-nums;
-}
-
-.challan__total td {
-  font-family: var(--font-display);
-  font-weight: 800;
-  background: #eef0fa;
-  color: #1a237e;
-}
-
-.challan__paid td {
-  color: #137333;
-  font-weight: 600;
-}
-
-.challan__notes {
-  list-style: decimal;
-  padding-left: 16px;
-  font-size: 10px;
-  color: #555;
-  margin-bottom: 10px;
-}
-
-.challan__foot {
-  display: flex;
-  justify-content: space-between;
-  font-size: 11px;
-  color: #333;
-  padding-top: 4px;
-}
-
-.challan-cut {
-  text-align: center;
-  color: #999;
-  font-size: 10px;
-  letter-spacing: 2px;
-  margin: 10px 0;
-  overflow: hidden;
-  white-space: nowrap;
-}
-
-/* ---------------- print ---------------- */
-
-@media print {
-  /* Legal paper: two 8.5in x 6.5in challan forms per sheet, cut at 6.5in.
-     Pick "Legal" as the paper size in the print dialog. */
-  @page { size: 8.5in 14in; margin: 0; }
+  /* The app's shell (full height, page padding) would push the sheet past
+     the paper and print a blank page after every challan. */
+  /* !important because these wrappers are styled from several files and any
+     stray padding pushes the sheet onto a second, blank page. */
+  html, body, .adm, .adm-main, .adm-page, .challan-sheets {
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-width: none !important;
+  }
 
   .adm { display: block; background: #fff; }
+  .challan-sheets { display: block; }
   .adm-side, .adm-noprint, .adm-alert, .adm-savestate { display: none !important; }
   .adm-main { padding: 0; }
   .adm-page { max-width: none; }
 
-  .challan-sheets { gap: 0; }
+  /* whitespace between the copies would form a phantom line box and
+     spill an empty extra sheet - the copies restore their own text size */
+  .challan-sheets { gap: 0; font-size: 0; line-height: 0; }
+  .challan-page { font-size: 0; line-height: 0; }
+  .challan { font-size: 12px; line-height: 1.4; }
 
   .challan-page {
-    border: none;
-    box-shadow: none;
-    border-radius: 0;
-    max-width: none;
+    display: flex;
+    align-items: stretch;
+    width: 14in;
+    height: 8.5in;
     padding: 0;
-    page-break-after: always;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    page-break-inside: avoid;
+    break-inside: avoid;
   }
 
-  .challan-page:last-child { page-break-after: auto; }
+  /* break BEFORE each following sheet - a break after the last one would
+     leave an empty page at the end */
+  .challan-page + .challan-page {
+    page-break-before: always;
+    break-before: page;
+  }
 
-  /* Each copy is one 6.5in form on Legal paper. On any other paper size
-     the copies shrink to half the page instead, so the pair can never
-     spill onto a second sheet. */
+  /* each copy fills its half of the sheet, top to bottom */
   .challan {
-    height: 6.5in;
-    max-height: 50vh; /* 1vh = 1% of the printed page's height */
+    flex: 1 1 0;
+    min-width: 0;
+    height: 8.5in;
     box-sizing: border-box;
-    padding: 0.35in 0.5in;
+    padding: 0.4in 0.45in;
     overflow: hidden;
     break-inside: avoid;
     page-break-inside: avoid;
   }
 
-  /* the cut line sits exactly on the 6.5in boundary */
+  /* the cut line runs down the middle, not across */
   .challan-cut {
-    height: 0;
+    flex: 0 0 0;
+    align-self: stretch;
+    width: 0;
+    height: auto;
     margin: 0;
     padding: 0;
+    border-top: none;
+    border-left: 1px dashed #99a;
+    font-size: 0;
     line-height: 0;
-    border-top: 1px dashed #999;
-    font-size: 8px;
+    color: transparent;
+    overflow: hidden;
   }
 }
 
