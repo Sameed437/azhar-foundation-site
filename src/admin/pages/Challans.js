@@ -49,10 +49,12 @@ const ChallanCopy = ({ copy, family, row, month, settings }) => (
 
     <table className="challan__amounts">
       <tbody>
-        <tr>
-          <td>Monthly fee — {monthShort(month)}</td>
-          <td>{rs(row.charge - (Number(row.record?.misc) || 0) - (Number(row.record?.fine) || 0))}</td>
-        </tr>
+        {row.charge > 0 && (
+          <tr>
+            <td>Monthly fee — {monthShort(month)}</td>
+            <td>{rs(row.charge - (Number(row.record?.misc) || 0) - (Number(row.record?.fine) || 0))}</td>
+          </tr>
+        )}
         {Number(row.record?.misc) > 0 && (
           <tr>
             <td>Other charges{row.record?.note ? ` (${row.record.note})` : ''}</td>
@@ -129,7 +131,9 @@ const Challans = () => {
     [families, records, months, month]
   );
 
-  const selected = summary.perFamily.filter(({ family, row }) => {
+  const selected = summary.perFamily.slice()
+    .sort((a, b) => a.family.id - b.family.id)
+    .filter(({ family, row }) => {
     if (!row) return false;
     // left families still get a challan while they owe money
     if (row.inactive && row.balance <= 0) return false;

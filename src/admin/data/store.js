@@ -69,7 +69,7 @@ export const normalizeSnapshot = (snapshot) => ({
       activeTo: '',
       ...family,
     }))
-    .sort((a, b) => (a.sort ?? a.id) - (b.sort ?? b.id)),
+    .sort((a, b) => Number(a.id) - Number(b.id)),
   records: snapshot?.records || {},
   teachers: (snapshot?.teachers || [])
     .map((teacher) => ({
@@ -82,7 +82,7 @@ export const normalizeSnapshot = (snapshot) => ({
       notes: '',
       ...teacher,
     }))
-    .sort((a, b) => (a.sort ?? a.id) - (b.sort ?? b.id)),
+    .sort((a, b) => Number(a.id) - Number(b.id)),
   salaries: snapshot?.salaries || {},
   /** Supabase project without the staff tables yet — the UI offers the SQL. */
   staffTablesMissing: Boolean(snapshot?.staffTablesMissing),

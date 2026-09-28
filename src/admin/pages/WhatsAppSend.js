@@ -75,7 +75,9 @@ const WhatsAppSend = () => {
     [families, records, months, month]
   );
 
-  const visible = summary.perFamily.filter(({ family, row }) => {
+  const visible = summary.perFamily.slice()
+    .sort((a, b) => a.family.id - b.family.id)
+    .filter(({ family, row }) => {
     if (!row) return false;
     // left families still get reminders while they owe money
     if (row.inactive && row.balance <= 0) return false;

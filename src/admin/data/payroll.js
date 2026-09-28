@@ -26,10 +26,14 @@ export const employedIn = (teacher, month) => {
 /** One teacher's line for one month. */
 export const salaryRow = (teacher, record, month) => {
   if (!employedIn(teacher, month)) {
+    // No salary is due once someone is off the payroll, but a payment
+    // recorded here (a final settlement, or salary held back) still counts.
+    const paidOff = num(record?.paid);
     return {
       month, record, inactive: true,
-      base: 0, allowance: 0, deduction: 0, payable: 0, paid: 0, remaining: 0,
-      status: 'inactive',
+      base: 0, allowance: 0, deduction: 0, payable: 0,
+      paid: paidOff, remaining: 0,
+      status: paidOff > 0 ? 'paid' : 'inactive',
     };
   }
 

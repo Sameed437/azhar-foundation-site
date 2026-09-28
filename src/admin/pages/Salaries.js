@@ -109,7 +109,9 @@ const Salaries = () => {
     [teachers, salaries, month]
   );
 
-  const visible = summary.perTeacher.filter(({ teacher, row }) => {
+  const visible = summary.perTeacher.slice()
+    .sort((a, b) => a.teacher.id - b.teacher.id)
+    .filter(({ teacher, row }) => {
     if (row.inactive && row.paid <= 0) return false;
     if (status === 'due' && row.remaining <= 0) return false;
     if (['paid', 'partial', 'unpaid'].includes(status) && row.status !== status) return false;

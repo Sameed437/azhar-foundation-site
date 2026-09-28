@@ -43,6 +43,16 @@ describe('salaryRow', () => {
     expect(row.status).toBe('paid');
   });
 
+
+  test('a payment recorded after someone leaves still counts', () => {
+    const teacher = { ...TEACHER, leftOn: '2026-09' };
+    const row = salaryRow(teacher, { paid: 12000 }, '2026-10');
+    expect(row.inactive).toBe(true);
+    expect(row.payable).toBe(0);   // no new salary is due
+    expect(row.paid).toBe(12000);  // but the money is not lost
+    expect(row.status).toBe('paid');
+  });
+
   test('months off payroll charge nothing', () => {
     const teacher = { ...TEACHER, joinedOn: '2026-09' };
     const row = salaryRow(teacher, undefined, '2026-08');
