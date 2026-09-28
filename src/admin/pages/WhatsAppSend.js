@@ -209,14 +209,16 @@ const WhatsAppSend = () => {
   };
 
   /**
-   * PDF / Pic: always open the parent's chat first — on every device — so the
-   * right conversation is on screen. The file then follows: the share sheet
-   * attaches it where that is allowed (and WhatsApp now lists this parent
-   * first, since their chat was just opened), otherwise it downloads and can
-   * be attached from inside the chat.
+   * PDF / Pic hand over the FILE — they must not turn into a text message.
+   *
+   * Phones: the share sheet carries the file straight into WhatsApp, so the
+   * chat is chosen there. Opening the chat first would launch WhatsApp with
+   * the text message instead and swallow the file, so it is not done here.
+   * Computers: no share sheet exists, so the file downloads and the parent's
+   * chat is opened for it to be dragged into.
    */
   const onSendFile = (kind, family, row) => {
-    openChat(family, row);
+    if (!canShareFiles) openChat(family, row);
     if (kind === 'pdf') sharePdf([{ family, row }]);
     else sharePic(family, row);
   };
@@ -402,7 +404,7 @@ const WhatsAppSend = () => {
                       type="button"
                       className="adm-wa__pdf"
                       onClick={() => onSendFile('pdf', family, row)}
-                      title="Opens this parent's chat, then hands over the challan PDF — attach it from the share sheet or from the chat"
+                      title="Challan PDF — on a phone the share sheet opens (pick WhatsApp, then this parent); on a computer the file downloads and their chat opens"
                     >
                       PDF
                     </button>
@@ -410,7 +412,7 @@ const WhatsAppSend = () => {
                       type="button"
                       className="adm-wa__pdf"
                       onClick={() => onSendFile('pic', family, row)}
-                      title="Opens this parent's chat, then hands over the challan picture — parents see it right in the chat"
+                      title="Challan picture — parents see it inside the chat. Share sheet on a phone, download + chat on a computer"
                     >
                       Pic
                     </button>
