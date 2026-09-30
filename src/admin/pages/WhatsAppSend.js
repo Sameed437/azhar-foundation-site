@@ -197,7 +197,8 @@ const WhatsAppSend = () => {
   /** Challan PDF — one family, or every selected family in one file. */
   const sharePdf = async (items) => {
     if (!items.length) return;
-    const doc = await buildChallanPdf(items, month, settings);
+    // parents get one page - the office copy is for printing, not for them
+    const doc = await buildChallanPdf(items, month, settings, { copies: 1 });
     await deliver(doc.output('blob'), challanPdfName(items, month),
       items.length === 1 ? items[0].family : null);
   };

@@ -150,49 +150,57 @@ const drawCopy = (doc, copyLabel, family, row, month, settings, logo) => {
   doc.text(nameLines, left + 72, y);
   y += nameLines.length * 14 + 10;
 
-  /* ---- amounts: the box hugs its rows ---- */
+  /* ---- amounts ----
+     The rows stretch to use whatever height is left between the details and
+     the notes, so a simple challan fills the sheet instead of leaving a
+     blank half page. */
   const notesTop = PAGE_H - 104;
   const boxTop = y;
   const lines = amountLines(row);
-  const boxHeight = lines.length * 26 + 14;
+  const ways = (settings.paymentDetails || '')
+    .split(String.fromCharCode(10))
+    .map((line) => line.trim())
+    .filter(Boolean);
+  const waysHeight = ways.length ? 30 + 16 + ways.length * 15 : 0;
+  const room = notesTop - 18 - waysHeight - boxTop;
+  const rowHeight = Math.max(26, Math.min(34, (room - 14) / lines.length));
+  const boxHeight = lines.length * rowHeight + 14;
+
   doc.setDrawColor(...LINE);
   doc.setLineWidth(1);
   doc.rect(left, boxTop, width, boxHeight);
 
-  let ay = boxTop + 26;
+  let ay = boxTop + 7 + rowHeight / 2 + 4;
   lines.forEach((line, index) => {
     if (line.total) {
       doc.setFillColor(238, 240, 250);
-      doc.rect(left + 1, ay - 17, width - 2, 25, 'F');
+      doc.rect(left + 1, ay - rowHeight / 2 - 4, width - 2, rowHeight, 'F');
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(...NAVY);
-      doc.setFontSize(12);
+      doc.setFontSize(12.5);
     } else if (line.paid) {
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(...GREEN);
-      doc.setFontSize(10.5);
+      doc.setFontSize(11);
     } else {
       doc.setFont('helvetica', 'normal');
       doc.setTextColor(...INK);
-      doc.setFontSize(10.5);
+      doc.setFontSize(11);
     }
     doc.text(line.label, left + 10, ay);
     doc.text(line.value, right - 10, ay, { align: 'right' });
     if (index < lines.length - 1) {
       doc.setDrawColor(...LINE);
       doc.setLineWidth(0.6);
-      doc.line(left + 1, ay + 8, right - 1, ay + 8);
+      doc.line(left + 1, ay + rowHeight / 2 - 4, right - 1, ay + rowHeight / 2 - 4);
     }
-    ay += 26;
+    ay += rowHeight;
   });
 
-  /* ---- ways to pay: useful, and it carries the eye down the sheet ---- */
-  const ways = (settings.paymentDetails || '')
-    .split(String.fromCharCode(10))
-    .map((line) => line.trim())
-    .filter(Boolean);
+  /* ---- ways to pay, just under the amounts ---- */
+  let afterY = boxTop + boxHeight + 20;
   if (ways.length) {
-    let py = boxTop + boxHeight + 30;
+    let py = afterY + 8;
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(9);
     doc.setTextColor(...MUTED);
@@ -202,10 +210,25 @@ const drawCopy = (doc, copyLabel, family, row, month, settings, logo) => {
     doc.setFontSize(10);
     doc.setTextColor(...INK);
     ways.forEach((line) => {
-      if (py > notesTop - 14) return; // never collide with the notes
+      if (py > notesTop - 12) return;
       doc.text(line, left, py);
       py += 15;
     });
+    afterY = py + 6;
+  }
+
+  /* ---- whatever height is left becomes the stamp box, the way a printed
+     challan carries the school's or bank's acknowledgement ---- */
+  const stampTop = afterY;
+  const stampBottom = notesTop - 16;
+  if (stampBottom - stampTop > 46) {
+    doc.setDrawColor(...LINE);
+    doc.setLineWidth(1);
+    doc.rect(left, stampTop, width, stampBottom - stampTop);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8);
+    doc.setTextColor(...MUTED);
+    doc.text('SCHOOL / BANK STAMP', left + 10, stampTop + 16);
   }
 
   /* ---- notes, pinned above the signature ---- */
@@ -240,16 +263,24 @@ const drawCopy = (doc, copyLabel, family, row, month, settings, logo) => {
  * 8.5in × 6.5in challan forms, the school's physical slip size.
  * items: [{ family, row }]
  */
-export const buildChallanPdf = async (items, month, settings) => {
+export const buildChallanPdf = async (items, month, settings, options = {}) => {
+  /* Printing needs both copies (the office keeps one); a parent receiving the
+     challan on WhatsApp should get a single page, so pass copies: 1. */
+  const copies = options.copies === 1
+    ? ['Fee Challan']
+    : ['Student Copy', 'Office Copy'];
+
   const logo = await loadLogo();
   const size = [PAGE_W, PAGE_H];
   const doc = new jsPDF({ unit: 'pt', format: size, orientation: 'portrait' });
 
-  items.forEach(({ family, row }, index) => {
-    if (index > 0) doc.addPage(size, 'portrait');
-    drawCopy(doc, 'Student Copy', family, row, month, settings, logo);
-    doc.addPage(size, 'portrait');
-    drawCopy(doc, 'Office Copy', family, row, month, settings, logo);
+  let first = true;
+  items.forEach(({ family, row }) => {
+    copies.forEach((label) => {
+      if (!first) doc.addPage(size, 'portrait');
+      first = false;
+      drawCopy(doc, label, family, row, month, settings, logo);
+    });
   });
 
   return doc;
