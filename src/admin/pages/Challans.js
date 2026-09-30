@@ -100,6 +100,22 @@ const ChallanCopy = ({ copy, family, row, month, settings }) => (
       </tbody>
     </table>
 
+    {(settings.paymentDetails || '').trim() && (
+      <div className="challan__pay">
+        <span>Ways to pay</span>
+        <ul>
+          {settings.paymentDetails.split(String.fromCharCode(10))
+            .map((line) => line.trim())
+            .filter(Boolean)
+            .map((line) => <li key={line}>{line}</li>)}
+        </ul>
+      </div>
+    )}
+
+    {/* fills whatever height is left, the way a printed challan carries the
+        school's or bank's acknowledgement */}
+    <div className="challan__stamp" aria-hidden="true">School / Bank stamp</div>
+
     <ol className="challan__notes">
       <li>{settings.challanNote1}</li>
       <li>{settings.challanNote2.replace('Rs. 100', `Rs. ${settings.finePerDay}`)}</li>
@@ -123,6 +139,7 @@ const Challans = () => {
   const [scope, setScope] = useState(() => (params.get('family') ? 'one' : 'due'));
   const [familyId, setFamilyId] = useState(() => Number(params.get('family')) || families[0]?.id || 0);
   const [klass, setKlass] = useState('');
+  const [officeCopy, setOfficeCopy] = useState(true);
 
   const classes = useMemo(() => uniqueClasses(families), [families]);
 
@@ -196,7 +213,19 @@ const Challans = () => {
           </select>
         )}
 
-        <span className="adm-toolbar__count">{selected.length} selected</span>
+        <select
+          value={officeCopy ? 'both' : 'student'}
+          onChange={(e) => setOfficeCopy(e.target.value === 'both')}
+          aria-label="Which copies to print"
+        >
+          <option value="both">Student + office copy</option>
+          <option value="student">Student copy only</option>
+        </select>
+
+        <span className="adm-toolbar__count">
+          {selected.length} famil{selected.length === 1 ? 'y' : 'ies'} ·{' '}
+          {selected.length * (officeCopy ? 2 : 1)} sheet{selected.length * (officeCopy ? 2 : 1) === 1 ? '' : 's'}
+        </span>
       </div>
 
       {!selected.length && (
@@ -217,8 +246,9 @@ const Challans = () => {
         {selected.map(({ family, row }) => (
           <section key={family.id} className="challan-page">
             <ChallanCopy copy="Student Copy" family={family} row={row} month={month} settings={settings} />
-            <div className="challan-cut" aria-hidden="true">✂ — — — — — — — — — — — — — — — — — — — — — — — — — — — —</div>
-            <ChallanCopy copy="Office Copy" family={family} row={row} month={month} settings={settings} />
+            {officeCopy && (
+              <ChallanCopy copy="Office Copy" family={family} row={row} month={month} settings={settings} />
+            )}
           </section>
         ))}
       </div>

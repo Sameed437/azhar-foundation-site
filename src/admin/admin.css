@@ -1396,6 +1396,38 @@
   font-weight: 600;
 }
 
+.challan__pay {
+  margin-top: 8px;
+  font-size: 11px;
+}
+
+.challan__pay span {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #5f6368;
+  margin-bottom: 3px;
+}
+
+.challan__pay ul { list-style: none; }
+
+.challan__stamp {
+  margin-top: 8px;
+  border: 1px solid #d2d6e4;
+  border-radius: 3px;
+  padding: 6px 8px;
+  min-height: 52px;
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #9aa0a6;
+}
+
 .challan__notes {
   list-style: decimal;
   padding-left: 16px;
@@ -1471,6 +1503,20 @@
     page-break-before: always;
     break-before: page;
   }
+
+
+  /* the copy fills its sheet: header and amounts at the top, the stamp box
+     growing into the space, notes and signature pinned at the foot */
+  .challan {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .challan__stamp { flex: 1 1 auto; }
+
+  .challan__notes { margin-top: 10px; }
+
+  .challan__foot { margin-top: 8px; }
 
   /* the paper is already the right size — nothing to cut */
   .challan-cut { display: none !important; }
