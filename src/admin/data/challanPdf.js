@@ -6,7 +6,6 @@ import { challanDate } from './whatsapp';
    sheet, so nothing has to be cut. */
 const PAGE_W = 468; // 6.5in
 const PAGE_H = 612; // 8.5in
-const PAD_TOP = 30;
 const MARGIN = 28;
 const NAVY = [26, 35, 126];
 const GREEN = [19, 115, 51];
@@ -54,109 +53,184 @@ export const amountLines = (row) => {
     });
     lines.push({ label: 'Remaining payable', value: rs(Math.max(0, row.balance)), total: true });
   } else {
-    lines.push({ label: 'Total payable (fee + arrears)', value: rs(Math.max(0, row.due)), total: true });
+    lines.push({
+      label: row.arrearsIn > 0 ? 'Total payable (fee + arrears)' : 'Total payable',
+      value: rs(Math.max(0, row.due)),
+      total: true,
+    });
   }
   return lines;
 };
 
-/** Draw one copy (student or office) starting at y; returns the y after it. */
+/**
+ * Draw one copy (student or office) filling a whole 6.5in x 8.5in sheet:
+ * header band at the top, details and amounts through the middle, and the
+ * notes and signature line pinned to the bottom edge.
+ */
 const drawCopy = (doc, copyLabel, family, row, month, settings, logo) => {
   const left = MARGIN;
   const right = PAGE_W - MARGIN;
-  let y = PAD_TOP;
+  const width = right - left;
 
-  /* header */
-  if (logo) doc.addImage(logo, 'PNG', left, y, 34, 34);
-  const textX = left + (logo ? 44 : 0);
+  /* outer frame — the slip reads as a form, not text floating on paper */
+  doc.setDrawColor(...LINE);
+  doc.setLineWidth(1);
+  doc.rect(left - 10, 22, width + 20, PAGE_H - 44);
+
+  /* ---- header ---- */
+  let y = 50;
+  if (logo) doc.addImage(logo, 'PNG', left, y - 18, 40, 40);
+  const textX = left + (logo ? 50 : 0);
+
   doc.setTextColor(...NAVY);
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(14);
-  doc.text(settings.schoolName, textX, y + 14);
+  doc.setFontSize(15);
+  doc.text(settings.schoolName, textX, y);
+
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(10);
   doc.setTextColor(...MUTED);
-  doc.text(`Fee Challan — ${monthShort(month)}`, textX, y + 28);
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(9);
-  doc.setTextColor(...NAVY);
-  doc.text(copyLabel.toUpperCase(), right, y + 14, { align: 'right' });
-  y += 42;
+  doc.text(`Fee Challan — ${monthLabel(month)}`, textX, y + 15);
 
-  /* meta */
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(8);
+  const badge = copyLabel.toUpperCase();
+  const badgeW = doc.getTextWidth(badge) + 16;
+  doc.setDrawColor(...NAVY);
+  doc.setLineWidth(0.8);
+  doc.roundedRect(right - badgeW, y - 11, badgeW, 16, 8, 8);
+  doc.setTextColor(...NAVY);
+  doc.text(badge, right - badgeW / 2, y, { align: 'center' });
+
+  y += 32;
+  doc.setDrawColor(...NAVY);
+  doc.setLineWidth(1.8);
+  doc.line(left, y, right, y);
+
+  /* ---- who and when ---- */
+  y += 26;
+  const metaRow = (label1, value1, label2, value2) => {
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9);
+    doc.setTextColor(...MUTED);
+    doc.text(label1, left, y);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10.5);
+    doc.setTextColor(...INK);
+    doc.text(value1, left + 72, y);
+    if (label2) {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(9);
+      doc.setTextColor(...MUTED);
+      doc.text(label2, left + 232, y);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10.5);
+      doc.setTextColor(...INK);
+      doc.text(value2, left + 296, y);
+    }
+    y += 20;
+  };
+
+  metaRow('Family ID', String(family.id), 'Issue month', monthLabel(month));
+  metaRow('Due date', challanDate(month, settings.dueDay),
+    'Valid till', challanDate(month, settings.validityDay));
+
   const enrolled = family.students.filter((s) => !s.left);
   const listed = enrolled.length ? enrolled : family.students;
   const names = listed.map((s) => `${s.name}${s.klass ? ` (${s.klass})` : ''}`).join(' + ')
     || family.name;
-  doc.setFontSize(9);
-  const meta = [
-    ['Family ID', String(family.id), 'Issue month', monthLabel(month)],
-    ['Due date', challanDate(month, settings.dueDay), 'Valid till', challanDate(month, settings.validityDay)],
-  ];
-  doc.setDrawColor(...LINE);
-  meta.forEach((cells) => {
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(...MUTED);
-    doc.text(cells[0], left, y);
-    doc.text(cells[2], left + 200, y);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(...INK);
-    doc.text(cells[1], left + 62, y);
-    doc.text(cells[3], left + 200 + 58, y);
-    y += 14;
-  });
   doc.setFont('helvetica', 'bold');
+  doc.setFontSize(9);
   doc.setTextColor(...MUTED);
   doc.text('Student(s)', left, y);
   doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10.5);
   doc.setTextColor(...INK);
-  const nameLines = doc.splitTextToSize(names, right - left - 62);
-  doc.text(nameLines, left + 62, y);
-  y += nameLines.length * 12 + 8;
+  const nameLines = doc.splitTextToSize(names, width - 72);
+  doc.text(nameLines, left + 72, y);
+  y += nameLines.length * 14 + 10;
 
-  /* amounts */
+  /* ---- amounts: the box hugs its rows ---- */
+  const notesTop = PAGE_H - 104;
+  const boxTop = y;
   const lines = amountLines(row);
-  lines.forEach((line) => {
-    const rowH = 17;
+  const boxHeight = lines.length * 26 + 14;
+  doc.setDrawColor(...LINE);
+  doc.setLineWidth(1);
+  doc.rect(left, boxTop, width, boxHeight);
+
+  let ay = boxTop + 26;
+  lines.forEach((line, index) => {
     if (line.total) {
       doc.setFillColor(238, 240, 250);
-      doc.rect(left, y - 12, right - left, rowH, 'F');
+      doc.rect(left + 1, ay - 17, width - 2, 25, 'F');
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(...NAVY);
+      doc.setFontSize(12);
     } else if (line.paid) {
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(...GREEN);
+      doc.setFontSize(10.5);
     } else {
       doc.setFont('helvetica', 'normal');
       doc.setTextColor(...INK);
+      doc.setFontSize(10.5);
     }
-    doc.setFontSize(line.total ? 10.5 : 9.5);
-    doc.text(line.label, left + 6, y);
-    doc.text(line.value, right - 6, y, { align: 'right' });
-    doc.setDrawColor(...LINE);
-    doc.line(left, y + 5, right, y + 5);
-    y += rowH;
+    doc.text(line.label, left + 10, ay);
+    doc.text(line.value, right - 10, ay, { align: 'right' });
+    if (index < lines.length - 1) {
+      doc.setDrawColor(...LINE);
+      doc.setLineWidth(0.6);
+      doc.line(left + 1, ay + 8, right - 1, ay + 8);
+    }
+    ay += 26;
   });
-  y += 6;
 
-  /* notes */
+  /* ---- ways to pay: useful, and it carries the eye down the sheet ---- */
+  const ways = (settings.paymentDetails || '')
+    .split(String.fromCharCode(10))
+    .map((line) => line.trim())
+    .filter(Boolean);
+  if (ways.length) {
+    let py = boxTop + boxHeight + 30;
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9);
+    doc.setTextColor(...MUTED);
+    doc.text('WAYS TO PAY', left, py);
+    py += 16;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.setTextColor(...INK);
+    ways.forEach((line) => {
+      if (py > notesTop - 14) return; // never collide with the notes
+      doc.text(line, left, py);
+      py += 15;
+    });
+  }
+
+  /* ---- notes, pinned above the signature ---- */
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(7.5);
+  doc.setFontSize(8);
   doc.setTextColor(...MUTED);
+  let ny = notesTop;
   const note2 = (settings.challanNote2 || '').replace('Rs. 100', `Rs. ${settings.finePerDay}`);
   [settings.challanNote1, note2].filter(Boolean).forEach((note, i) => {
-    const wrapped = doc.splitTextToSize(`${i + 1}. ${note}`, right - left);
-    doc.text(wrapped, left, y);
-    y += wrapped.length * 9 + 2;
+    const wrapped = doc.splitTextToSize(`${i + 1}. ${note}`, width);
+    doc.text(wrapped, left, ny);
+    ny += wrapped.length * 10 + 3;
   });
-  y += 8;
 
-  /* signature line */
-  doc.setFontSize(8.5);
+  /* ---- signature line at the foot ---- */
+  const sy = PAGE_H - 46;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9.5);
   doc.setTextColor(...INK);
-  doc.text('Received by: ____________________', left, y);
-  doc.text('Date: ____________', right, y, { align: 'right' });
-
-  return y + 10;
+  doc.text('Received by', left, sy);
+  doc.text('Date', right - 108, sy);
+  doc.setDrawColor(...MUTED);
+  doc.setLineWidth(0.8);
+  doc.line(left + 62, sy + 2, left + 210, sy + 2);
+  doc.line(right - 78, sy + 2, right, sy + 2);
 };
 
 /**

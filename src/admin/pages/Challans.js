@@ -93,7 +93,7 @@ const ChallanCopy = ({ copy, family, row, month, settings }) => (
           </>
         ) : (
           <tr className="challan__total">
-            <td>Total payable (fee + arrears)</td>
+            <td>Total payable{row.arrearsIn > 0 ? " (fee + arrears)" : ""}</td>
             <td>{rs(Math.max(0, row.due))}</td>
           </tr>
         )}

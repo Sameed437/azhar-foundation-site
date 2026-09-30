@@ -41,7 +41,8 @@ export const challanMessage = (family, row, month, settings) => {
     lines.push(`Paid so far: ${rs(row.record.received)}`);
     lines.push(`*Remaining payable: ${rs(Math.max(0, row.balance))}*`);
   } else {
-    lines.push(`*Total payable (fee + arrears): ${rs(Math.max(0, row.due))}*`);
+    const label = row.arrearsIn > 0 ? 'Total payable (fee + arrears)' : 'Total payable';
+    lines.push(`*${label}: ${rs(Math.max(0, row.due))}*`);
   }
   lines.push(
     '',
