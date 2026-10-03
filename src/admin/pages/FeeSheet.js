@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Icon from '../../components/Icon';
 import { useAdmin } from '../AdminContext';
-import { amt, monthLabel, monthSummary, receivedSplit, rs } from '../data/calc';
+import { amt, monthLabel, monthSummary, onRegister, receivedSplit, rs } from '../data/calc';
 import { familyHasClass, uniqueClasses } from '../data/classes';
 
 const STATUS_LABEL = {
@@ -36,8 +36,7 @@ const FeeSheet = () => {
   );
 
   const visible = summary.perFamily.filter(({ family, row }) => {
-    // left families stay on the register while they still owe (or paid) money
-    if (row?.inactive && row.balance <= 0 && !(row.received > 0)) return false;
+    if (!onRegister(row)) return false;
     if (!familyHasClass(family, klass)) return false;
     if (status === 'due' && row.balance <= 0) return false;
     if (['paid', 'partial', 'unpaid'].includes(status) && row.status !== status) return false;

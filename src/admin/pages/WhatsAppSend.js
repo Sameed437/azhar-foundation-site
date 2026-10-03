@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Icon from '../../components/Icon';
 import { useAdmin } from '../AdminContext';
-import { amt, monthLabel, monthShort, monthSummary } from '../data/calc';
+import { amt, monthLabel, monthShort, monthSummary, onRegister } from '../data/calc';
 import { familyHasClass, uniqueClasses } from '../data/classes';
 import { waChallanLink, waPhone } from '../data/whatsapp';
 import { buildChallanPdf, challanPdfName } from '../data/challanPdf';
@@ -78,9 +78,7 @@ const WhatsAppSend = () => {
   const visible = summary.perFamily.slice()
     .sort((a, b) => a.family.id - b.family.id)
     .filter(({ family, row }) => {
-    if (!row) return false;
-    // left families still get reminders while they owe money
-    if (row.inactive && row.balance <= 0) return false;
+    if (!onRegister(row)) return false;
     if (!familyHasClass(family, klass)) return false;
     if (who === 'due' && row.balance <= 0) return false;
     if (!query.trim()) return true;

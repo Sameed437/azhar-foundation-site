@@ -143,6 +143,14 @@ export const receivedSplit = (row) => {
 };
 
 /**
+ * Is this family on the register for a given month? Everyone still enrolled
+ * counts; a family that has left stays on it while they owe money or paid
+ * something. Every page filters with this, so they all list the same people.
+ */
+export const onRegister = (row) =>
+  Boolean(row) && (!row.inactive || row.balance > 0 || row.received > 0);
+
+/**
  * Everything the fee sheet and dashboard need for one month, across families.
  */
 export const monthSummary = (families, records, months, month) => {

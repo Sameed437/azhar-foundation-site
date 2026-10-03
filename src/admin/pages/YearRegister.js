@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import Icon from '../../components/Icon';
 import { useAdmin } from '../AdminContext';
-import { amt, familyLedger, monthLabel } from '../data/calc';
+import { amt, familyLedger, monthLabel, onRegister } from '../data/calc';
 import { familyHasClass, uniqueClasses } from '../data/classes';
 
 const todayIso = () => new Date().toISOString().slice(0, 10);
@@ -60,7 +60,9 @@ const YearRegister = () => {
   );
 
   const visible = enriched
-    .filter(({ family }) => {
+    .filter(({ family, ledger }) => {
+      // the same people the Fee Sheet lists, across the whole session
+      if (!ledger.rows.some(onRegister)) return false;
       if (!familyHasClass(family, klass)) return false;
       if (!query.trim()) return true;
       const needle = query.trim().toLowerCase();

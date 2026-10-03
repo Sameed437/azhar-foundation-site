@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import Icon from '../../components/Icon';
 import { useAdmin } from '../AdminContext';
-import { monthLabel, monthShort, monthSummary, rs } from '../data/calc';
+import { monthLabel, monthShort, monthSummary, onRegister, rs } from '../data/calc';
 import { familyHasClass, uniqueClasses } from '../data/classes';
 import { challanDate } from '../data/whatsapp';
 
@@ -151,9 +151,7 @@ const Challans = () => {
   const selected = summary.perFamily.slice()
     .sort((a, b) => a.family.id - b.family.id)
     .filter(({ family, row }) => {
-    if (!row) return false;
-    // left families still get a challan while they owe money
-    if (row.inactive && row.balance <= 0) return false;
+    if (!onRegister(row)) return false;
     if (scope === 'one') return family.id === Number(familyId);
     if (!familyHasClass(family, klass)) return false;
     if (scope === 'due') return row.balance > 0;

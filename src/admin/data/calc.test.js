@@ -4,6 +4,7 @@ import {
   monthSummary,
   sessionLabel,
   sessionMonths,
+  onRegister,
 } from './calc';
 
 const MONTHS = sessionMonths(2026);
@@ -122,5 +123,33 @@ describe('sessionMonths with a later start month', () => {
     expect(rows[0].month).toBe('2026-09');
     expect(rows[0].arrearsIn).toBe(5000);
     expect(rows[0].due).toBe(8000);
+  });
+});
+
+describe('onRegister — the one rule every page lists by', () => {
+  const months = sessionMonths(2026, 9);
+  const rowsFor = (family, records) => familyLedger(family, records, months).rows;
+
+  test('an enrolled family is always on the register', () => {
+    const rows = rowsFor({ id: 1, monthlyFee: 2000 }, {});
+    expect(rows.every(onRegister)).toBe(true);
+  });
+
+  test('a family that left owing nothing drops off', () => {
+    const rows = rowsFor({ id: 2, monthlyFee: 2000, activeTo: '2026-09' }, { '2026-09': { received: 2000 } });
+    expect(onRegister(rows[0])).toBe(true);        // September, still enrolled
+    expect(onRegister(rows[1])).toBe(false);       // October, gone and clear
+  });
+
+  test('a family that left still owing stays listed', () => {
+    const rows = rowsFor({ id: 3, monthlyFee: 2000, activeTo: '2026-09' }, {});
+    expect(onRegister(rows[1])).toBe(true);
+  });
+
+  test('a payment after leaving puts them back on that month', () => {
+    const rows = rowsFor({ id: 4, monthlyFee: 2000, activeTo: '2026-09' },
+      { '2026-09': { received: 2000 }, '2026-11': { received: 500 } });
+    expect(onRegister(rows[1])).toBe(false);       // October: nothing owed, nothing paid
+    expect(onRegister(rows[2])).toBe(true);        // November: money came in
   });
 });
