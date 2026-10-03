@@ -1465,7 +1465,8 @@
   /* the app shell's full height and padding would spill a blank sheet after
      every challan; these wrappers carry styling from several files, hence
      the !important */
-  html, body, .adm, .adm-main, .adm-page, .challan-sheets, .challan-page {
+  /* note: .challan-page is NOT in this list - it needs its own 8.5in height */
+  html, body, .adm, .adm-main, .adm-page, .challan-sheets {
     margin: 0 !important;
     padding: 0 !important;
     border: 0 !important;
@@ -1477,17 +1478,26 @@
 
   .adm { display: block; background: #fff; }
   .adm-side, .adm-noprint, .adm-alert, .adm-savestate { display: none !important; }
-  .challan-sheets, .challan-page { display: block; box-shadow: none; border-radius: 0; }
+  .challan-sheets { display: block; }
+  .challan-page { box-shadow: none; border-radius: 0; }
 
   /* whitespace between copies would form a phantom line and spill a page */
   .challan-sheets, .challan-page { font-size: 0; line-height: 0; }
 
-  /* one copy = one sheet */
-  .challan {
+  /* the sheet is a column: one copy fills it, or two share it */
+  .challan-page {
+    display: flex;
+    flex-direction: column;
     width: 6.5in;
     height: 8.5in;
+    overflow: hidden;
+  }
+
+  .challan {
+    flex: 1 1 0;
+    min-height: 0;
     box-sizing: border-box;
-    padding: 0.35in 0.4in;
+    padding: 0.16in 0.3in;
     overflow: hidden;
     font-size: 12px;
     line-height: 1.4;
@@ -1495,31 +1505,37 @@
     break-inside: avoid;
   }
 
-  /* start a new sheet before every copy except the very first — a break
-     after the last one would leave an empty page at the end */
-  .challan-page + .challan-page > .challan:first-child,
-  .challan + .challan,
-  .challan-cut + .challan {
+  /* two copies sharing a sheet: tighter type, no stamp box */
+  .challan-page--pair .challan { font-size: 9.5px; padding: 0.13in 0.26in; }
+  .challan-page--pair .challan__head { padding-bottom: 3px; margin-bottom: 5px; }
+  .challan-page--pair .challan__head img { width: 30px; height: 30px; }
+  .challan-page--pair .challan__head h2 { font-size: 12px; }
+  .challan-page--pair .challan__meta th,
+  .challan-page--pair .challan__meta td,
+  .challan-page--pair .challan__amounts td { padding: 2px 5px; }
+  .challan-page--pair .challan__stamp { display: none; }
+  .challan-page--pair .challan__pay { margin-top: 4px; font-size: 8.5px; }
+  .challan-page--pair .challan__notes { margin-top: 4px; font-size: 7px; }
+  .challan-page--pair .challan__foot { margin-top: 4px; font-size: 8px; }
+
+  /* the cut line sits between the two copies */
+  .challan-cut {
+    flex: 0 0 0;
+    height: 0;
+    margin: 0;
+    padding: 0;
+    border-top: 1px dashed #99a;
+    font-size: 0;
+    line-height: 0;
+    color: transparent;
+    overflow: hidden;
+  }
+
+  /* start a new sheet before every following challan */
+  .challan-page + .challan-page {
     page-break-before: always;
     break-before: page;
   }
-
-
-  /* the copy fills its sheet: header and amounts at the top, the stamp box
-     growing into the space, notes and signature pinned at the foot */
-  .challan {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .challan__stamp { flex: 1 1 auto; }
-
-  .challan__notes { margin-top: 10px; }
-
-  .challan__foot { margin-top: 8px; }
-
-  /* the paper is already the right size — nothing to cut */
-  .challan-cut { display: none !important; }
 }
 
 /* ---------------- responsive ---------------- */

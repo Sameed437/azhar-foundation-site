@@ -63,72 +63,83 @@ export const amountLines = (row) => {
 };
 
 /**
- * Draw one copy (student or office) filling a whole 6.5in x 8.5in sheet:
- * header band at the top, details and amounts through the middle, and the
- * notes and signature line pinned to the bottom edge.
+ * Draw one copy inside a band of the sheet: (top, height). A full-height
+ * band is the single-copy challan; a half-height band is one of the two
+ * copies that share a printed sheet, so the type and spacing tighten.
  */
-const drawCopy = (doc, copyLabel, family, row, month, settings, logo) => {
+const drawCopy = (doc, top, height, copyLabel, family, row, month, settings, logo) => {
   const left = MARGIN;
   const right = PAGE_W - MARGIN;
   const width = right - left;
+  const tight = height < 400;
 
-  /* outer frame — the slip reads as a form, not text floating on paper */
+  /* scale: the roomy single-copy sheet, or the tight half-sheet */
+  const m = tight
+    ? { head: 20, logo: 26, name: 11, sub: 7.5, rule: 38, metaTop: 54, metaStep: 13,
+        metaLabel: 7.5, metaValue: 8.5, rowMin: 15, rowMax: 19, amount: 8.5, total: 9.5,
+        noteSize: 6.2, noteUp: 38, signUp: 14, signSize: 7.5, payUp: 0 }
+    : { head: 34, logo: 40, name: 15, sub: 10, rule: 58, metaTop: 82, metaStep: 20,
+        metaLabel: 9, metaValue: 10.5, rowMin: 26, rowMax: 34, amount: 11, total: 12.5,
+        noteSize: 8, noteUp: 92, signUp: 34, signSize: 9.5, payUp: 28 };
+
+  /* frame */
   doc.setDrawColor(...LINE);
   doc.setLineWidth(1);
-  doc.rect(left - 10, 22, width + 20, PAGE_H - 44);
+  doc.rect(left - 8, top + 8, width + 16, height - 16);
 
   /* ---- header ---- */
-  let y = 50;
-  if (logo) doc.addImage(logo, 'PNG', left, y - 18, 40, 40);
-  const textX = left + (logo ? 50 : 0);
+  let y = top + m.head;
+  if (logo) doc.addImage(logo, 'PNG', left, y - m.logo * 0.45, m.logo, m.logo);
+  const textX = left + (logo ? m.logo + 10 : 0);
 
   doc.setTextColor(...NAVY);
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(15);
+  doc.setFontSize(m.name);
   doc.text(settings.schoolName, textX, y);
 
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(10);
+  doc.setFontSize(m.sub);
   doc.setTextColor(...MUTED);
-  doc.text(`Fee Challan — ${monthLabel(month)}`, textX, y + 15);
+  doc.text(`Fee Challan — ${monthLabel(month)}`, textX, y + m.sub + 4);
 
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(8);
+  doc.setFontSize(tight ? 6.5 : 8);
   const badge = copyLabel.toUpperCase();
-  const badgeW = doc.getTextWidth(badge) + 16;
+  const badgeW = doc.getTextWidth(badge) + (tight ? 10 : 16);
+  const badgeH = tight ? 12 : 16;
   doc.setDrawColor(...NAVY);
   doc.setLineWidth(0.8);
-  doc.roundedRect(right - badgeW, y - 11, badgeW, 16, 8, 8);
+  doc.roundedRect(right - badgeW, y - badgeH * 0.7, badgeW, badgeH, badgeH / 2, badgeH / 2);
   doc.setTextColor(...NAVY);
   doc.text(badge, right - badgeW / 2, y, { align: 'center' });
 
-  y += 32;
   doc.setDrawColor(...NAVY);
-  doc.setLineWidth(1.8);
-  doc.line(left, y, right, y);
+  doc.setLineWidth(tight ? 1.2 : 1.8);
+  doc.line(left, top + m.rule, right, top + m.rule);
 
   /* ---- who and when ---- */
-  y += 26;
+  y = top + m.metaTop;
+  const col2 = left + width * 0.52;
   const metaRow = (label1, value1, label2, value2) => {
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(9);
+    doc.setFontSize(m.metaLabel);
     doc.setTextColor(...MUTED);
     doc.text(label1, left, y);
     doc.setFont('helvetica', 'normal');
-    doc.setFontSize(10.5);
+    doc.setFontSize(m.metaValue);
     doc.setTextColor(...INK);
-    doc.text(value1, left + 72, y);
+    doc.text(value1, left + (tight ? 56 : 72), y);
     if (label2) {
       doc.setFont('helvetica', 'bold');
-      doc.setFontSize(9);
+      doc.setFontSize(m.metaLabel);
       doc.setTextColor(...MUTED);
-      doc.text(label2, left + 232, y);
+      doc.text(label2, col2, y);
       doc.setFont('helvetica', 'normal');
-      doc.setFontSize(10.5);
+      doc.setFontSize(m.metaValue);
       doc.setTextColor(...INK);
-      doc.text(value2, left + 296, y);
+      doc.text(value2, col2 + (tight ? 48 : 62), y);
     }
-    y += 20;
+    y += m.metaStep;
   };
 
   metaRow('Family ID', String(family.id), 'Issue month', monthLabel(month));
@@ -140,147 +151,140 @@ const drawCopy = (doc, copyLabel, family, row, month, settings, logo) => {
   const names = listed.map((s) => `${s.name}${s.klass ? ` (${s.klass})` : ''}`).join(' + ')
     || family.name;
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(9);
+  doc.setFontSize(m.metaLabel);
   doc.setTextColor(...MUTED);
   doc.text('Student(s)', left, y);
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(10.5);
+  doc.setFontSize(m.metaValue);
   doc.setTextColor(...INK);
-  const nameLines = doc.splitTextToSize(names, width - 72);
-  doc.text(nameLines, left + 72, y);
-  y += nameLines.length * 14 + 10;
+  const nameX = left + (tight ? 56 : 72);
+  const nameLines = doc.splitTextToSize(names, right - nameX);
+  doc.text(nameLines, nameX, y);
+  y += nameLines.length * (tight ? 10 : 14) + (tight ? 6 : 10);
 
-  /* ---- amounts ----
-     The rows stretch to use whatever height is left between the details and
-     the notes, so a simple challan fills the sheet instead of leaving a
-     blank half page. */
-  const notesTop = PAGE_H - 104;
+  /* ---- amounts ---- */
+  const notesTop = top + height - m.noteUp;
   const boxTop = y;
   const lines = amountLines(row);
   const ways = (settings.paymentDetails || '')
     .split(String.fromCharCode(10))
     .map((line) => line.trim())
     .filter(Boolean);
-  const waysHeight = ways.length ? 30 + 16 + ways.length * 15 : 0;
-  const room = notesTop - 18 - waysHeight - boxTop;
-  const rowHeight = Math.max(26, Math.min(34, (room - 14) / lines.length));
-  const boxHeight = lines.length * rowHeight + 14;
+  const waysHeight = (ways.length && !tight) ? 30 + 16 + ways.length * 15 : 0;
+  const room = notesTop - 12 - waysHeight - boxTop;
+  const rowHeight = Math.max(m.rowMin, Math.min(m.rowMax, (room - 10) / lines.length));
+  const boxHeight = lines.length * rowHeight + (tight ? 8 : 14);
 
   doc.setDrawColor(...LINE);
   doc.setLineWidth(1);
   doc.rect(left, boxTop, width, boxHeight);
 
-  let ay = boxTop + 7 + rowHeight / 2 + 4;
+  let ay = boxTop + (tight ? 4 : 7) + rowHeight / 2 + 3;
   lines.forEach((line, index) => {
     if (line.total) {
       doc.setFillColor(238, 240, 250);
-      doc.rect(left + 1, ay - rowHeight / 2 - 4, width - 2, rowHeight, 'F');
+      doc.rect(left + 1, ay - rowHeight / 2 - 3, width - 2, rowHeight, 'F');
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(...NAVY);
-      doc.setFontSize(12.5);
+      doc.setFontSize(m.total);
     } else if (line.paid) {
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(...GREEN);
-      doc.setFontSize(11);
+      doc.setFontSize(m.amount);
     } else {
       doc.setFont('helvetica', 'normal');
       doc.setTextColor(...INK);
-      doc.setFontSize(11);
+      doc.setFontSize(m.amount);
     }
-    doc.text(line.label, left + 10, ay);
-    doc.text(line.value, right - 10, ay, { align: 'right' });
+    doc.text(line.label, left + 8, ay);
+    doc.text(line.value, right - 8, ay, { align: 'right' });
     if (index < lines.length - 1) {
       doc.setDrawColor(...LINE);
       doc.setLineWidth(0.6);
-      doc.line(left + 1, ay + rowHeight / 2 - 4, right - 1, ay + rowHeight / 2 - 4);
+      doc.line(left + 1, ay + rowHeight / 2 - 3, right - 1, ay + rowHeight / 2 - 3);
     }
     ay += rowHeight;
   });
 
-  /* ---- ways to pay, just under the amounts ---- */
-  let afterY = boxTop + boxHeight + 20;
+  /* ---- ways to pay (and, with room to spare, a stamp box) ---- */
+  let afterY = boxTop + boxHeight + (tight ? 12 : 20);
   if (ways.length) {
-    let py = afterY + 8;
+    let py = afterY + (tight ? 0 : 8);
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(9);
+    doc.setFontSize(tight ? 6.5 : 9);
     doc.setTextColor(...MUTED);
     doc.text('WAYS TO PAY', left, py);
-    py += 16;
+    py += tight ? 10 : 16;
     doc.setFont('helvetica', 'normal');
-    doc.setFontSize(10);
+    doc.setFontSize(tight ? 7.5 : 10);
     doc.setTextColor(...INK);
     ways.forEach((line) => {
-      if (py > notesTop - 12) return;
+      if (py > notesTop - 8) return;
       doc.text(line, left, py);
-      py += 15;
+      py += tight ? 10 : 15;
     });
-    afterY = py + 6;
+    afterY = py + (tight ? 2 : 6);
   }
 
-  /* ---- whatever height is left becomes the stamp box, the way a printed
-     challan carries the school's or bank's acknowledgement ---- */
-  const stampTop = afterY;
-  const stampBottom = notesTop - 16;
-  if (stampBottom - stampTop > 46) {
+  if (!tight && notesTop - 16 - afterY > 46) {
     doc.setDrawColor(...LINE);
     doc.setLineWidth(1);
-    doc.rect(left, stampTop, width, stampBottom - stampTop);
+    doc.rect(left, afterY, width, notesTop - 16 - afterY);
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(8);
     doc.setTextColor(...MUTED);
-    doc.text('SCHOOL / BANK STAMP', left + 10, stampTop + 16);
+    doc.text('SCHOOL / BANK STAMP', left + 10, afterY + 16);
   }
 
-  /* ---- notes, pinned above the signature ---- */
+  /* ---- notes and signature at the foot of the band ---- */
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(8);
+  doc.setFontSize(m.noteSize);
   doc.setTextColor(...MUTED);
   let ny = notesTop;
   const note2 = (settings.challanNote2 || '').replace('Rs. 100', `Rs. ${settings.finePerDay}`);
   [settings.challanNote1, note2].filter(Boolean).forEach((note, i) => {
     const wrapped = doc.splitTextToSize(`${i + 1}. ${note}`, width);
     doc.text(wrapped, left, ny);
-    ny += wrapped.length * 10 + 3;
+    ny += wrapped.length * (tight ? 8 : 10) + 2;
   });
 
-  /* ---- signature line at the foot ---- */
-  const sy = PAGE_H - 46;
+  const sy = top + height - m.signUp;
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(9.5);
+  doc.setFontSize(m.signSize);
   doc.setTextColor(...INK);
   doc.text('Received by', left, sy);
-  doc.text('Date', right - 108, sy);
+  doc.text('Date', right - (tight ? 86 : 108), sy);
   doc.setDrawColor(...MUTED);
   doc.setLineWidth(0.8);
-  doc.line(left + 62, sy + 2, left + 210, sy + 2);
-  doc.line(right - 78, sy + 2, right, sy + 2);
+  doc.line(left + (tight ? 48 : 62), sy + 2, left + (tight ? 160 : 210), sy + 2);
+  doc.line(right - (tight ? 60 : 78), sy + 2, right, sy + 2);
 };
 
-/**
- * Build one PDF with a Legal page (8.5in × 14in) per family: the Student
- * Copy fills the top 6.5in, the cut line sits exactly at 6.5in, and the
- * Office Copy fills the next 6.5in — so one straight cut yields two
- * 8.5in × 6.5in challan forms, the school's physical slip size.
- * items: [{ family, row }]
- */
-export const buildChallanPdf = async (items, month, settings, options = {}) => {
-  /* Printing needs both copies (the office keeps one); a parent receiving the
-     challan on WhatsApp should get a single page, so pass copies: 1. */
-  const copies = options.copies === 1
-    ? ['Fee Challan']
-    : ['Student Copy', 'Office Copy'];
+/** Dashed cut line between the two copies sharing a sheet. */
+const drawCutLine = (doc, y) => {
+  doc.setDrawColor(...MUTED);
+  doc.setLineWidth(0.7);
+  for (let x = 12; x < PAGE_W - 12; x += 9) doc.line(x, y, x + 4, y);
+};
 
+export const buildChallanPdf = async (items, month, settings, options = {}) => {
+  /* A parent receiving the challan on WhatsApp gets one copy filling the
+     page; printing puts the student and office copies on the same sheet. */
+  const single = options.copies === 1;
   const logo = await loadLogo();
   const size = [PAGE_W, PAGE_H];
   const doc = new jsPDF({ unit: 'pt', format: size, orientation: 'portrait' });
 
-  let first = true;
-  items.forEach(({ family, row }) => {
-    copies.forEach((label) => {
-      if (!first) doc.addPage(size, 'portrait');
-      first = false;
-      drawCopy(doc, label, family, row, month, settings, logo);
-    });
+  items.forEach(({ family, row }, index) => {
+    if (index > 0) doc.addPage(size, 'portrait');
+    if (single) {
+      drawCopy(doc, 0, PAGE_H, 'Fee Challan', family, row, month, settings, logo);
+      return;
+    }
+    const half = PAGE_H / 2;
+    drawCopy(doc, 0, half, 'Student Copy', family, row, month, settings, logo);
+    drawCutLine(doc, half);
+    drawCopy(doc, half, half, 'Office Copy', family, row, month, settings, logo);
   });
 
   return doc;

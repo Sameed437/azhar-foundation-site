@@ -216,13 +216,13 @@ const Challans = () => {
           onChange={(e) => setOfficeCopy(e.target.value === 'both')}
           aria-label="Which copies to print"
         >
-          <option value="both">Student + office copy</option>
+          <option value="both">Both copies on one sheet</option>
           <option value="student">Student copy only</option>
         </select>
 
         <span className="adm-toolbar__count">
           {selected.length} famil{selected.length === 1 ? 'y' : 'ies'} ·{' '}
-          {selected.length * (officeCopy ? 2 : 1)} sheet{selected.length * (officeCopy ? 2 : 1) === 1 ? '' : 's'}
+          {selected.length} sheet{selected.length === 1 ? '' : 's'}
         </span>
       </div>
 
@@ -242,10 +242,16 @@ const Challans = () => {
 
       <div className="challan-sheets">
         {selected.map(({ family, row }) => (
-          <section key={family.id} className="challan-page">
+          <section
+            key={family.id}
+            className={`challan-page${officeCopy ? ' challan-page--pair' : ''}`}
+          >
             <ChallanCopy copy="Student Copy" family={family} row={row} month={month} settings={settings} />
             {officeCopy && (
-              <ChallanCopy copy="Office Copy" family={family} row={row} month={month} settings={settings} />
+              <>
+                <div className="challan-cut" aria-hidden="true" />
+                <ChallanCopy copy="Office Copy" family={family} row={row} month={month} settings={settings} />
+              </>
             )}
           </section>
         ))}
